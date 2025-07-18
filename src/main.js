@@ -7,13 +7,26 @@ import {
     IconRobot,
     IconTrophy,
     IconApps,
-    IconSend
+    IconSend,
+    IconHome,
+    IconBook,
+    IconHeart,
+    IconRight
 } from '@arco-design/web-vue/es/icon'
 
 const app = createApp(App)
 
 // 注册Arco Design图标
-const icons = [IconRobot, IconTrophy, IconApps, IconSend]
+const icons = [
+    IconRobot,
+    IconTrophy,
+    IconApps,
+    IconSend,
+    IconHome,
+    IconBook,
+    IconHeart,
+    IconRight
+]
 icons.forEach(icon => {
     app.component(icon.name, icon)
 })

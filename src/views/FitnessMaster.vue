@@ -1,7 +1,7 @@
 <template>
   <div class="fitness-master">
     <chat-interface
-      title="AI健身大师"
+      title="AI健身教练"
       description="您的专业健身教练，为您提供个性化的健身建议和计划"
       chat-type="fitness"
     />

@@ -85,7 +85,7 @@ export default {
       chatId.value = ApiService.generateChatId();
       // 添加欢迎消息
       const welcomeMessage = props.chatType === 'fitness' 
-        ? "欢迎使用AI健身大师！您可以向我咨询任何健身相关的问题。"
+        ? "欢迎使用AI健身教练！您可以向我咨询任何健身相关的问题。"
         : "欢迎使用AI超级智能体！我可以帮助您解决各种问题。";
       
       messages.value.push({

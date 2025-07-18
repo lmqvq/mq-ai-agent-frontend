@@ -7,7 +7,7 @@ const routes = [
         name: 'Home',
         component: () => import('../views/Home.vue'),
         meta: {
-            title: '首页 - AI健身大师'
+            title: '首页 - AI健身教练'
         }
     },
     {
@@ -15,7 +15,7 @@ const routes = [
         name: 'FitnessMaster',
         component: () => import('../views/FitnessMaster.vue'),
         meta: {
-            title: 'AI健身大师'
+            title: 'AI健身教练'
         }
     },
     {

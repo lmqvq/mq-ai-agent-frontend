@@ -12,7 +12,7 @@ const apiClient = axios.create({
 // API服务
 const ApiService = {
     /**
-     * 创建SSE连接 - AI健身大师
+     * 创建SSE连接 - AI健身教练
      * @param {string} message 消息内容
      * @param {string} chatId 聊天室ID
      * @returns {EventSource} SSE连接实例
