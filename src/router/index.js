@@ -25,6 +25,54 @@ const routes = [
         meta: {
             title: 'AI超级智能体'
         }
+    },
+    {
+        path: '/profile',
+        name: 'UserProfile',
+        component: () => import('../views/UserProfile.vue'),
+        meta: {
+            title: '个人中心 - AI健身教练'
+        }
+    },
+    {
+        path: '/data',
+        name: 'FitnessData',
+        component: () => import('../views/FitnessData.vue'),
+        meta: {
+            title: '健身数据 - AI健身教练'
+        }
+    },
+    {
+        path: '/plans',
+        name: 'FitnessPlans',
+        component: () => import('../views/FitnessPlans.vue'),
+        meta: {
+            title: '健身计划 - AI健身教练'
+        }
+    },
+    {
+        path: '/knowledge',
+        name: 'FitnessKnowledge',
+        component: () => import('../views/FitnessKnowledge.vue'),
+        meta: {
+            title: '健身知识库 - AI健身教练'
+        }
+    },
+    {
+        path: '/login',
+        name: 'Login',
+        component: () => import('../views/Login.vue'),
+        meta: {
+            title: '登录 - AI健身教练'
+        }
+    },
+    {
+        path: '/register',
+        name: 'Register',
+        component: () => import('../views/Register.vue'),
+        meta: {
+            title: '注册 - AI健身教练'
+        }
     }
 ]
 
