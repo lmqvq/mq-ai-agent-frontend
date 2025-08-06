@@ -5,6 +5,9 @@
         <component :is="Component" />
       </transition>
     </router-view>
+    <footer class="global-footer">
+      <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank">桂ICP备2024028689号-4</a>
+    </footer>
   </div>
 </template>
 
@@ -35,6 +38,32 @@ html, body {
 
 #app {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+// 全局页脚样式
+.global-footer {
+  text-align: center;
+  padding: 12px;
+  background-color: #fff;
+  border-top: 1px solid #eee;
+  font-size: 14px;
+  color: #666;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 100;
+  
+  a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    
+    &:hover {
+      color: #4080ff;
+    }
+  }
 }
 
 // 页面过渡动画

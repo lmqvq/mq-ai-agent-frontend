@@ -147,6 +147,7 @@ export default {
 .main-content {
   flex: 1;
   padding: 40px;
+  padding-bottom: 60px; /* 为页脚留出空间 */
   overflow-y: auto;
 }
 

@@ -2,6 +2,9 @@ import axios from 'axios'
 
 // 创建axios实例
 const apiClient = axios.create({
+    // 线上地址
+    // baseURL: 'https://cozi.chat/api',
+    // 本地开发地址
     baseURL: 'http://localhost:8123/api',
     timeout: 10000,
     headers: {

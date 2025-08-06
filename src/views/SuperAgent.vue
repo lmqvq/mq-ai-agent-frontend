@@ -25,6 +25,7 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 20px;
+  padding-bottom: 60px; /* 为页脚留出空间 */
   box-sizing: border-box;
   background-color: #f0f2f5;
 }
