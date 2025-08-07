@@ -426,6 +426,7 @@ export default {
     background: rgba(255, 255, 255, 0.1);
     padding: 8px;
     border-radius: 16px;
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
 
     .nav-tab {

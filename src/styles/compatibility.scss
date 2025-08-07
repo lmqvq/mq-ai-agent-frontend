@@ -1,0 +1,55 @@
+// CSS兼容性修复文件
+// 用于解决不同浏览器的兼容性问题
+
+// 修复HTML元素的文本大小调整
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+// 修复触摸操作兼容性
+a,
+area,
+button,
+input,
+label,
+select,
+summary,
+textarea,
+[tabindex] {
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+}
+
+// 修复用户选择兼容性（全局覆盖）
+.immersive-translate-link {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+// 通用的用户选择禁用类
+.user-select-none {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+// 通用的backdrop-filter类
+.backdrop-blur {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.backdrop-blur-sm {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.backdrop-blur-lg {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}

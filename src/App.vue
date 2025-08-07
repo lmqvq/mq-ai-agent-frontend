@@ -20,6 +20,7 @@ export default {
 <style lang="scss">
 @import '@arco-design/web-vue/dist/arco.css';
 @import './styles/main.scss';
+@import './styles/compatibility.scss';
 
 * {
   margin: 0;

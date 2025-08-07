@@ -320,6 +320,7 @@ export default {
 .register-card {
   width: 450px;
   background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   border-radius: 24px;
   padding: 48px;
@@ -432,6 +433,7 @@ export default {
     border: 2px solid #e8e8e8;
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.8);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
 
     &:hover {

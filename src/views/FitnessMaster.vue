@@ -1,6 +1,6 @@
 <template>
   <div class="fitness-master">
-    <chat-interface
+    <chat-manager
       title="AI健身教练"
       description="您的专业健身教练，为您提供个性化的健身建议和计划"
       chat-type="fitness"
@@ -9,12 +9,12 @@
 </template>
 
 <script>
-import ChatInterface from '@/components/ChatInterface.vue';
+import ChatManager from '@/components/ChatManager.vue';
 
 export default {
   name: 'FitnessMaster',
   components: {
-    ChatInterface
+    ChatManager
   }
 };
 </script>
@@ -22,17 +22,13 @@ export default {
 <style lang="scss" scoped>
 .fitness-master {
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  padding-bottom: 60px; /* 为页脚留出空间 */
-  box-sizing: border-box;
-  background-color: #f0f2f5;
+  overflow: hidden;
 }
 
 @media (max-width: 768px) {
   .fitness-master {
-    padding: 10px;
+    height: 100vh;
+    overflow: hidden;
   }
 }
-</style> 
+</style>

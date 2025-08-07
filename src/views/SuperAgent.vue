@@ -1,6 +1,6 @@
 <template>
   <div class="super-agent">
-    <chat-interface
+    <chat-manager
       title="AI超级智能体"
       description="解答各种问题的智能助手，知识丰富，回答准确"
       chat-type="agent"
@@ -9,12 +9,12 @@
 </template>
 
 <script>
-import ChatInterface from '@/components/ChatInterface.vue';
+import ChatManager from '@/components/ChatManager.vue';
 
 export default {
   name: 'SuperAgent',
   components: {
-    ChatInterface
+    ChatManager
   }
 };
 </script>
@@ -22,17 +22,13 @@ export default {
 <style lang="scss" scoped>
 .super-agent {
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  padding-bottom: 60px; /* 为页脚留出空间 */
-  box-sizing: border-box;
-  background-color: #f0f2f5;
+  overflow: hidden;
 }
 
 @media (max-width: 768px) {
   .super-agent {
-    padding: 10px;
+    height: 100vh;
+    overflow: hidden;
   }
 }
-</style> 
+</style>
