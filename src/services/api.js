@@ -113,6 +113,45 @@ const ApiService = {
     },
 
     /**
+     * 上传用户头像
+     * @param {File} file 头像文件
+     * @returns {Promise} 上传结果，返回头像URL
+     */
+    async uploadAvatar(file) {
+        try {
+            const formData = new FormData()
+            formData.append('file', file)
+
+            const response = await apiClient.post('/user/avatar/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 更新用户头像
+     * @param {string} avatarUrl 头像URL
+     * @returns {Promise} 更新结果
+     */
+    async updateAvatar(avatarUrl) {
+        try {
+            const response = await apiClient.post('/user/avatar/update', null, {
+                params: {
+                    avatarUrl: avatarUrl
+                }
+            })
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
      * 创建SSE连接 - AI超级智能体
      * @param {string} message 消息内容
      * @param {string} chatId 聊天室ID

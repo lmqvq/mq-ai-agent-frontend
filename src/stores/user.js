@@ -132,6 +132,33 @@ export const useUserStore = () => {
   }
 
   /**
+   * 更新用户头像
+   * @param {string} avatarUrl 新的头像URL
+   * @returns {Promise} 更新结果
+   */
+  const updateUserAvatar = async (avatarUrl) => {
+    try {
+      const response = await ApiService.updateAvatar(avatarUrl)
+      if (response.code === 0) {
+        // 更新本地用户信息
+        if (userInfo.value) {
+          const updatedUser = { ...userInfo.value, userAvatar: avatarUrl }
+          setUserInfo(updatedUser)
+        }
+        return { success: true }
+      } else {
+        return { success: false, message: response.message || '头像更新失败' }
+      }
+    } catch (error) {
+      console.error('更新头像失败:', error)
+      return {
+        success: false,
+        message: error.message || '网络错误，请稍后重试'
+      }
+    }
+  }
+
+  /**
    * 获取用户角色文本
    * @param {string} role 用户角色
    * @returns {string} 角色文本
@@ -157,6 +184,7 @@ export const useUserStore = () => {
     register,
     logout,
     checkLoginStatus,
+    updateUserAvatar,
     getRoleText
   }
 }
