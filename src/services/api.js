@@ -150,14 +150,44 @@ const ApiService = {
                 console.log('对话列表详情:', dialogues);
 
                 // 转换数据格式以适配前端
-                const formattedDialogues = dialogues.map(item => ({
-                    id: item.chatId,
-                    title: item.lastMessage ? item.lastMessage.substring(0, 20) + '...' : '新对话',
-                    type: 'fitness', // 默认类型，可以根据需要调整
-                    createTime: item.createTime,
-                    updateTime: item.updateTime,
-                    lastMessage: item.lastMessage
-                }));
+                const formattedDialogues = dialogues.map(item => {
+                    // 优化对话标题：使用用户的第一条消息作为标题
+                    let title = '新对话';
+
+                    if (item.messages && Array.isArray(item.messages) && item.messages.length > 0) {
+                        // 查找第一条用户消息
+                        const firstUserMessage = item.messages.find(msg =>
+                            msg.messageType === 'USER' || msg.messageType === 'user'
+                        );
+
+                        if (firstUserMessage && firstUserMessage.message) {
+                            const message = firstUserMessage.message.trim();
+                            // 使用6-12个字符作为标题
+                            if (message.length <= 12) {
+                                title = message;
+                            } else {
+                                title = message.substring(0, 12) + '...';
+                            }
+                        }
+                    } else if (item.lastMessage) {
+                        // 如果没有消息数组，使用lastMessage
+                        const message = item.lastMessage.trim();
+                        if (message.length <= 12) {
+                            title = message;
+                        } else {
+                            title = message.substring(0, 12) + '...';
+                        }
+                    }
+
+                    return {
+                        id: item.chatId,
+                        title: title,
+                        type: 'fitness', // 默认类型，可以根据需要调整
+                        createTime: item.createTime,
+                        updateTime: item.updateTime,
+                        lastMessage: item.lastMessage
+                    };
+                });
 
                 console.log('转换后的对话列表:', formattedDialogues);
 
@@ -315,9 +345,15 @@ const ApiService = {
      */
     async deleteChatHistoryByDialogue(dialogueId) {
         try {
-            const response = await apiClient.delete(`/chatHistory/dialogue/${dialogueId}`)
+            console.log('正在调用删除对话API，chatId:', dialogueId);
+            const response = await apiClient.delete(`/chat/history/delete?chatId=${dialogueId}`)
+            console.log('删除对话API响应状态:', response.status);
+            console.log('删除对话API响应数据:', response.data);
             return response.data
         } catch (error) {
+            console.error('删除对话API调用失败:', error);
+            console.error('错误状态码:', error.response?.status);
+            console.error('错误响应:', error.response?.data);
             throw error.response?.data || error
         }
     },

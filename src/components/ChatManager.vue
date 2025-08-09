@@ -41,7 +41,7 @@
             <a-button
               type="text"
               size="mini"
-              @click.stop="deleteDialogue(dialogue.id)"
+              @click.stop="showDeleteConfirm(dialogue)"
               :loading="isDeletingDialogue === dialogue.id"
               aria-label="删除对话"
             >
@@ -122,6 +122,54 @@
         </a-input>
       </div>
     </div>
+
+    <!-- 删除确认弹窗 -->
+    <a-modal
+      v-model:visible="deleteConfirmVisible"
+      :footer="false"
+      :closable="false"
+      width="400px"
+      class="delete-confirm-modal"
+    >
+      <div class="delete-confirm-content">
+        <div class="delete-confirm-header">
+          <div class="warning-icon">
+            <icon-exclamation-circle-fill />
+          </div>
+          <h3>确定删除对话？</h3>
+          <a-button
+            type="text"
+            size="small"
+            @click="deleteConfirmVisible = false"
+            class="close-btn"
+          >
+            <icon-close />
+          </a-button>
+        </div>
+        <div class="delete-confirm-body">
+          <p>删除后，聊天记录将不可恢复。</p>
+        </div>
+        <div class="delete-confirm-footer">
+          <a-button
+            size="large"
+            @click="deleteConfirmVisible = false"
+            class="cancel-btn"
+          >
+            取消
+          </a-button>
+          <a-button
+            type="primary"
+            size="large"
+            status="danger"
+            :loading="isDeletingDialogue === dialogueToDelete?.id"
+            @click="confirmDeleteDialogue"
+            class="delete-btn"
+          >
+            删除
+          </a-button>
+        </div>
+      </div>
+    </a-modal>
   </div>
 </template>
 
@@ -178,6 +226,8 @@ export default {
     const dialogueList = ref([]);
     const isCreatingDialogue = ref(false);
     const isDeletingDialogue = ref(null);
+    const deleteConfirmVisible = ref(false);
+    const dialogueToDelete = ref(null);
 
     let eventSource = null;
     
@@ -517,7 +567,77 @@ export default {
       // 注意：不再调用后端API保存初始消息
       // keep_report记录会在用户发送第一条真实消息时自动创建
     };
-    
+
+    // 显示删除确认弹窗
+    const showDeleteConfirm = (dialogue) => {
+      dialogueToDelete.value = dialogue;
+      deleteConfirmVisible.value = true;
+    };
+
+    // 确认删除对话
+    const confirmDeleteDialogue = async () => {
+      if (!dialogueToDelete.value) return;
+
+      const dialogueId = dialogueToDelete.value.id;
+      isDeletingDialogue.value = dialogueId;
+
+      try {
+        const response = await ApiService.deleteDialogue(dialogueId);
+
+        if (response.code === 0) {
+          // 从列表中移除
+          dialogueList.value = dialogueList.value.filter(d => d.id !== dialogueId);
+
+          // 从本地缓存中移除
+          LocalStorageService.removeDialogue(dialogueId);
+          LocalStorageService.removeChatHistory(dialogueId);
+
+          // 如果删除的是当前对话，切换到其他对话或创建新对话
+          if (currentDialogueId.value === dialogueId) {
+            if (dialogueList.value.length > 0) {
+              await switchDialogue(dialogueList.value[0].id);
+            } else {
+              LocalStorageService.clearCurrentDialogueId();
+              currentDialogueId.value = null;
+              messages.value = [];
+              showWelcomeMessage();
+            }
+          }
+
+          Message.success('对话删除成功');
+
+          // 关闭弹窗
+          deleteConfirmVisible.value = false;
+          dialogueToDelete.value = null;
+        }
+      } catch (error) {
+        console.error('删除对话失败:', error);
+        Message.error('删除对话失败，请检查网络连接');
+
+        // 即使服务器删除失败，也可以从本地移除（用户体验优先）
+        dialogueList.value = dialogueList.value.filter(d => d.id !== dialogueId);
+        LocalStorageService.removeDialogue(dialogueId);
+        LocalStorageService.removeChatHistory(dialogueId);
+
+        if (currentDialogueId.value === dialogueId) {
+          if (dialogueList.value.length > 0) {
+            await switchDialogue(dialogueList.value[0].id);
+          } else {
+            LocalStorageService.clearCurrentDialogueId();
+            currentDialogueId.value = null;
+            messages.value = [];
+            showWelcomeMessage();
+          }
+        }
+
+        // 关闭弹窗
+        deleteConfirmVisible.value = false;
+        dialogueToDelete.value = null;
+      } finally {
+        isDeletingDialogue.value = null;
+      }
+    };
+
     // 删除对话
     const deleteDialogue = async (dialogueId) => {
       isDeletingDialogue.value = dialogueId;
@@ -698,10 +818,11 @@ export default {
       }
     };
 
-    // 格式化时间
+    // 格式化时间 - 年月日时分格式
     const formatTime = (timestamp) => {
       const date = new Date(timestamp);
-      return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+      return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+      // return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
     };
 
     // 格式化对话时间
@@ -748,9 +869,13 @@ export default {
       dialogueList,
       isCreatingDialogue,
       isDeletingDialogue,
+      deleteConfirmVisible,
+      dialogueToDelete,
       createNewDialogue,
       switchDialogue,
       deleteDialogue,
+      showDeleteConfirm,
+      confirmDeleteDialogue,
       sendMessage,
       formatTime,
       formatDialogueTime,
@@ -765,9 +890,10 @@ export default {
 <style lang="scss" scoped>
 .chat-manager {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 60px); /* 减去footer高度 */
   background-color: #f5f5f5;
   overflow: hidden; // 防止整体页面滚动
+  margin-bottom: 60px; /* 为footer留出空间 */
 }
 
 // 左侧边栏
@@ -857,16 +983,37 @@ export default {
       padding: 12px;
       cursor: pointer;
       border-radius: 8px;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       border: 1px solid transparent;
+      transform: translateX(0);
+      overflow: hidden;
+
+      /* 添加微妙的阴影效果 */
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.5s;
+      }
 
       &:hover {
         background-color: #f8f9fa;
         border-color: #e8e8e8;
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
         .dialogue-actions {
           opacity: 1;
+        }
+
+        /* 触发光效动画 */
+        &::before {
+          left: 100%;
         }
       }
 
@@ -996,7 +1143,7 @@ export default {
 
   .chat-messages {
     flex: 1;
-    padding: 24px;
+    padding: 24px 24px 120px 24px; /* 底部增加padding为固定输入框留空间 */
     overflow-y: auto;
     background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
     min-height: 0; // 确保能正确收缩
@@ -1004,51 +1151,113 @@ export default {
 
 
     .message {
-      margin-bottom: 20px;
-      max-width: 75%;
+      margin-bottom: 16px;
+      max-width: 85%;
+      animation: messageSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      animation-fill-mode: forwards;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
 
       .message-content {
-        padding: 14px 18px;
-        border-radius: 16px;
-        font-size: 15px;
-        line-height: 1.6;
+        padding: 12px 16px;
+        border-radius: 18px;
+        font-size: 16px;
+        line-height: 1.5;
         word-break: break-word;
         position: relative;
+        max-width: 100%;
+        display: inline-block;
+        text-align: left;
       }
 
       .message-time {
-        font-size: 11px;
-        color: #999;
-        margin-top: 6px;
+        font-size: 12px;
+        color: #8E8E93;
+        margin-top: 4px;
         font-weight: 400;
+        opacity: 0.8;
+        align-self: flex-start;
       }
 
       &.user-message {
         margin-left: auto;
-        text-align: right;
+        align-items: flex-end;
+        max-width: 80%;
 
         .message-content {
-          background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
-          color: #fff;
-          border-top-right-radius: 4px;
-          box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25);
-          -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
+          background: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%);
+          color: #ffffff;
+          border-radius: 18px 18px 4px 18px;
+          box-shadow: 0 2px 12px rgba(0, 122, 255, 0.15);
+          position: relative;
+          font-weight: 400;
+          letter-spacing: 0.3px;
+
+          /* 添加气泡尾巴 */
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: -6px;
+            width: 0;
+            height: 0;
+            border: 6px solid transparent;
+            border-left-color: #007AFF;
+            border-bottom: none;
+            border-right: none;
+          }
+
+          /* 优化文字显示 */
+          span {
+            display: block;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+          }
         }
 
         .message-time {
-          text-align: right;
+          align-self: flex-end;
+          color: #8E8E93;
+          font-size: 12px;
+          margin-top: 4px;
         }
       }
 
       &.ai-message {
         margin-right: auto;
+        max-width: 80%;
 
         .message-content {
-          background-color: #fff;
-          color: #333;
-          border-top-left-radius: 4px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          background-color: #F2F2F7;
+          color: #1C1C1E;
+          border-radius: 18px 18px 18px 4px;
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+          position: relative;
+          font-weight: 400;
+          letter-spacing: 0.3px;
+
+          /* 添加气泡尾巴 */
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -6px;
+            width: 0;
+            height: 0;
+            border: 6px solid transparent;
+            border-right-color: #F2F2F7;
+            border-bottom: none;
+            border-left: none;
+          }
+
+          /* 优化文字显示 */
+          span {
+            display: block;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+          }
           border: 1px solid rgba(0, 0, 0, 0.06);
           -webkit-backdrop-filter: blur(10px);
           backdrop-filter: blur(10px);
@@ -1087,10 +1296,16 @@ export default {
   }
 
   .chat-input {
+    position: fixed;
+    bottom: 60px; /* 在footer上方 */
+    left: 280px; /* 侧边栏宽度 */
+    right: 0;
     flex-shrink: 0; // 防止输入框被压缩
     padding: 20px 24px;
     background-color: #fff;
     border-top: 1px solid #e8e8e8;
+    z-index: 100;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 
     :deep(.arco-input-wrapper) {
       border-radius: 24px;
@@ -1134,15 +1349,36 @@ export default {
         background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
         border: none;
         box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+
+        /* 添加点击波纹效果 */
+        &::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 0;
+          height: 0;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.3);
+          transform: translate(-50%, -50%);
+          transition: width 0.3s, height 0.3s;
+        }
 
         &:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+          transform: translateY(-2px) scale(1.05);
+          box-shadow: 0 6px 16px rgba(24, 144, 255, 0.4);
         }
 
         &:active {
-          transform: translateY(0);
+          transform: translateY(0) scale(0.95);
+
+          &::before {
+            width: 100%;
+            height: 100%;
+          }
         }
 
         &:disabled {
@@ -1162,6 +1398,30 @@ export default {
 
   30% {
     transform: translateY(-6px);
+  }
+}
+
+@keyframes messageSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -1194,7 +1454,103 @@ export default {
     }
 
     .chat-input {
+      left: 0; /* 小屏幕时占满宽度 */
       padding: 12px 16px;
+    }
+  }
+}
+
+/* 删除确认弹窗样式 */
+.delete-confirm-modal {
+  .arco-modal-body {
+    padding: 0;
+  }
+}
+
+.delete-confirm-content {
+  padding: 24px;
+
+  .delete-confirm-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    position: relative;
+
+    .warning-icon {
+      color: #ff7d00;
+      font-size: 20px;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1d2129;
+      flex: 1;
+    }
+
+    .close-btn {
+      position: absolute;
+      right: 0;
+      top: -4px;
+      color: #86909c;
+
+      &:hover {
+        color: #4e5969;
+        background-color: #f2f3f5;
+      }
+    }
+  }
+
+  .delete-confirm-body {
+    margin-bottom: 24px;
+
+    p {
+      margin: 0;
+      color: #4e5969;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+
+  .delete-confirm-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+
+    .cancel-btn {
+      min-width: 80px;
+      height: 40px;
+      border-radius: 6px;
+      border: 1px solid #d9d9d9;
+      background-color: #fff;
+      color: #4e5969;
+
+      &:hover {
+        border-color: #165dff;
+        color: #165dff;
+      }
+    }
+
+    .delete-btn {
+      min-width: 80px;
+      height: 40px;
+      border-radius: 6px;
+      background-color: #f53f3f;
+      border-color: #f53f3f;
+
+      &:hover {
+        background-color: #f76965;
+        border-color: #f76965;
+      }
+
+      &:active {
+        background-color: #e8272c;
+        border-color: #e8272c;
+      }
     }
   }
 }
