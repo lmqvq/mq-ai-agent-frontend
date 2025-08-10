@@ -173,10 +173,104 @@
 ```
 
 
+## doChatWithKeepAppSSEUser
+
+
+**接口地址**:`/api/ai/keep_app/chat/sse/user`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`text/event-stream`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|message||query|true|string||
+|chatId||query|true|string||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK||
+
+
+**响应参数**:
+
+
+暂无
+
+
+**响应示例**:
+```javascript
+
+```
+
+
 ## doChatWithKeepAppSync
 
 
 **接口地址**:`/api/ai/keep_app/chat/sync`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|message||query|true|string||
+|chatId||query|true|string||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK||
+
+
+**响应参数**:
+
+
+暂无
+
+
+**响应示例**:
+```javascript
+
+```
+
+
+## doChatWithKeepAppSyncUser
+
+
+**接口地址**:`/api/ai/keep_app/chat/sync/user`
 
 
 **请求方式**:`GET`
@@ -267,6 +361,290 @@
 {
 	"timeout": 0
 }
+```
+
+
+## doChatWithManusUser
+
+
+**接口地址**:`/api/ai/manus/chat/user`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|message||query|true|string||
+|chatId||query|true|string||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|SseEmitter|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|timeout||integer(int64)|integer(int64)|
+
+
+**响应示例**:
+```javascript
+{
+	"timeout": 0
+}
+```
+
+
+# chat-history-controller
+
+
+## deleteChatHistory
+
+
+**接口地址**:`/api/chat/history/delete`
+
+
+**请求方式**:`DELETE`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|chatId||query|true|string||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseBoolean|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||boolean||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": true,
+	"message": ""
+}
+```
+
+
+## getChatHistoryDetail
+
+
+**接口地址**:`/api/chat/history/detail`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|chatId||query|true|string||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseChatHistoryDetailDTO|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||ChatHistoryDetailDTO|ChatHistoryDetailDTO|
+|&emsp;&emsp;chatId||string||
+|&emsp;&emsp;messages||array|ChatMessageDTO|
+|&emsp;&emsp;&emsp;&emsp;messageType||string||
+|&emsp;&emsp;&emsp;&emsp;message||string||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": {
+		"chatId": "",
+		"messages": [
+			{
+				"messageType": "",
+				"message": ""
+			}
+		]
+	},
+	"message": ""
+}
+```
+
+
+## getChatHistoryList
+
+
+**接口地址**:`/api/chat/history/list`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+暂无
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseListChatHistoryListDTO|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||array|ChatHistoryListDTO|
+|&emsp;&emsp;chatId||string||
+|&emsp;&emsp;lastMessage||string||
+|&emsp;&emsp;createTime||string(date-time)||
+|&emsp;&emsp;updateTime||string(date-time)||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": [
+		{
+			"chatId": "",
+			"lastMessage": "",
+			"createTime": "",
+			"updateTime": ""
+		}
+	],
+	"message": ""
+}
+```
+
+
+# health-controller
+
+
+## healthCheck
+
+
+**接口地址**:`/api/health`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+暂无
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK||
+
+
+**响应参数**:
+
+
+暂无
+
+
+**响应示例**:
+```javascript
+
 ```
 
 
