@@ -142,14 +142,47 @@
     <a-modal v-model:visible="showDataModal" title="记录身体数据" @ok="saveBodyData">
       <a-form :model="bodyDataForm" layout="vertical">
         <a-form-item label="体重 (kg)">
-          <a-input-number v-model="bodyDataForm.weight" placeholder="输入体重" :precision="1" />
+          <a-input-number
+            v-model="bodyDataForm.weight"
+            placeholder="输入体重"
+            :precision="1"
+            @change="calculateBMIRealtime"
+          />
         </a-form-item>
         <a-form-item label="体脂率 (%)">
           <a-input-number v-model="bodyDataForm.bodyFat" placeholder="输入体脂率" :precision="1" />
         </a-form-item>
         <a-form-item label="身高 (cm)">
-          <a-input-number v-model="bodyDataForm.height" placeholder="输入身高" />
+          <a-input-number
+            v-model="bodyDataForm.height"
+            placeholder="输入身高"
+            @change="calculateBMIRealtime"
+          />
         </a-form-item>
+
+        <!-- BMI计算结果显示区域 -->
+        <a-form-item v-if="bmiResult" label="BMI计算结果">
+          <div class="bmi-result-card">
+            <a-spin :loading="bmiCalculating">
+              <div class="bmi-info">
+                <div class="bmi-value">
+                  <span class="label">BMI指数：</span>
+                  <span class="value" :class="getBMIStatusClass(bmiResult.bmi)">{{ bmiResult.bmi }}</span>
+                  <span class="category">{{ bmiResult.category }}</span>
+                </div>
+                <div class="ideal-weight" v-if="bmiResult.idealWeightMin && bmiResult.idealWeightMax">
+                  <span class="label">理想体重：</span>
+                  <span class="value">{{ bmiResult.idealWeightMin }}kg - {{ bmiResult.idealWeightMax }}kg</span>
+                </div>
+                <div class="health-advice" v-if="bmiResult.healthAdvice">
+                  <span class="label">健康建议：</span>
+                  <span class="advice">{{ bmiResult.healthAdvice }}</span>
+                </div>
+              </div>
+            </a-spin>
+          </div>
+        </a-form-item>
+
         <a-form-item label="记录日期">
           <a-date-picker v-model="bodyDataForm.recordDate" style="width: 100%" />
         </a-form-item>
@@ -279,6 +312,10 @@ export default {
       notes: ''
     });
 
+    // BMI计算相关数据
+    const bmiResult = ref(null);
+    const bmiCalculating = ref(false);
+
     // 方法
     const loadUserInfo = async () => {
       try {
@@ -311,9 +348,45 @@ export default {
       return '#f53f3f';
     };
 
+    // BMI计算相关方法
+    const getBMIStatusClass = (bmi) => {
+      if (!bmi) return '';
+      if (bmi < 18.5) return 'underweight';
+      if (bmi < 24) return 'normal';
+      if (bmi < 28) return 'overweight';
+      return 'obese';
+    };
+
+    const calculateBMIRealtime = async () => {
+      if (bodyDataForm.weight && bodyDataForm.height) {
+        try {
+          bmiCalculating.value = true;
+          const response = await ApiService.calculateBMI({
+            weight: bodyDataForm.weight,
+            height: bodyDataForm.height
+          });
+
+          if (response.code === 0) {
+            bmiResult.value = response.data;
+          } else {
+            console.error('BMI计算失败:', response.message);
+            bmiResult.value = null;
+          }
+        } catch (error) {
+          console.error('BMI计算接口调用失败:', error);
+          bmiResult.value = null;
+        } finally {
+          bmiCalculating.value = false;
+        }
+      } else {
+        bmiResult.value = null;
+      }
+    };
+
     const calculateBMI = () => {
-      if (latestBodyData.value.weight && bodyDataForm.height) {
-        const heightInM = bodyDataForm.height / 100;
+      // 保留原有的简单BMI计算用于显示最新BMI
+      if (latestBodyData.value.weight && latestBodyData.value.height) {
+        const heightInM = latestBodyData.value.height / 100;
         return (latestBodyData.value.weight / (heightInM * heightInM)).toFixed(1);
       }
       return null;
@@ -575,6 +648,11 @@ export default {
       handleFileChange,
       cancelUpload,
       confirmUpload,
+      // BMI相关
+      bmiResult,
+      bmiCalculating,
+      getBMIStatusClass,
+      calculateBMIRealtime,
       // 其他方法
       getRoleText,
       formatDate,
@@ -980,6 +1058,78 @@ export default {
     margin-top: 24px;
     padding-top: 24px;
     border-top: 1px solid #f0f0f0;
+  }
+}
+
+// BMI结果显示样式
+.bmi-result-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e9ecef;
+
+  .bmi-info {
+    .bmi-value {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+
+      .label {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .value {
+        font-size: 18px;
+        font-weight: 700;
+
+        &.underweight {
+          color: #1890ff;
+        }
+
+        &.normal {
+          color: #52c41a;
+        }
+
+        &.overweight {
+          color: #faad14;
+        }
+
+        &.obese {
+          color: #f5222d;
+        }
+      }
+
+      .category {
+        background: #e6f7ff;
+        color: #1890ff;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+    }
+
+    .ideal-weight, .health-advice {
+      margin-bottom: 8px;
+      font-size: 14px;
+
+      .label {
+        font-weight: 600;
+        color: #333;
+        margin-right: 8px;
+      }
+
+      .value {
+        color: #666;
+      }
+
+      .advice {
+        color: #666;
+        line-height: 1.4;
+      }
+    }
   }
 }
 </style>

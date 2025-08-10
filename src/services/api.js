@@ -469,7 +469,396 @@ const ApiService = {
         } catch (error) {
             throw error.response?.data || error
         }
+    },
+
+    // ==================== 健身数据管理 ====================
+
+    /**
+     * 添加健身数据
+     * @param {Object} fitnessData 健身数据
+     * @param {number} fitnessData.weight 体重(kg)
+     * @param {number} fitnessData.bodyFat 体脂率(%)
+     * @param {number} fitnessData.height 身高(cm)
+     * @param {string} fitnessData.dateRecorded 记录日期
+     * @returns {Promise} 添加结果
+     */
+    async addFitnessData(fitnessData) {
+        try {
+            const response = await apiClient.post('/fitness/data/add', fitnessData)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 更新健身数据
+     * @param {Object} fitnessData 健身数据
+     * @param {number} fitnessData.id 数据ID
+     * @param {number} fitnessData.weight 体重(kg)
+     * @param {number} fitnessData.bodyFat 体脂率(%)
+     * @param {number} fitnessData.height 身高(cm)
+     * @param {string} fitnessData.dateRecorded 记录日期
+     * @returns {Promise} 更新结果
+     */
+    async updateFitnessData(fitnessData) {
+        try {
+            const response = await apiClient.post('/fitness/data/update', fitnessData)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 删除健身数据
+     * @param {number} id 数据ID
+     * @returns {Promise} 删除结果
+     */
+    async deleteFitnessData(id) {
+        try {
+            const response = await apiClient.post('/fitness/data/delete', { id })
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 获取健身数据详情
+     * @param {number} id 数据ID
+     * @returns {Promise} 数据详情
+     */
+    async getFitnessData(id) {
+        try {
+            const response = await apiClient.get(`/fitness/data/get?id=${id}`)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 分页查询我的健身数据
+     * @param {Object} queryParams 查询参数
+     * @param {number} queryParams.current 当前页
+     * @param {number} queryParams.pageSize 页面大小
+     * @param {string} queryParams.startDate 开始日期
+     * @param {string} queryParams.endDate 结束日期
+     * @returns {Promise} 分页数据
+     */
+    async getMyFitnessDataByPage(queryParams) {
+        try {
+            const response = await apiClient.post('/fitness/data/my/list/page', queryParams)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 获取健身数据趋势
+     * @param {number} days 天数，默认30天
+     * @returns {Promise} 趋势数据
+     */
+    async getFitnessTrends(days = 30) {
+        try {
+            const response = await apiClient.get(`/fitness/data/trends?days=${days}`)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    // ==================== 运动记录管理 ====================
+
+    /**
+     * 添加运动记录
+     * @param {Object} exerciseData 运动数据
+     * @param {string} exerciseData.exerciseType 运动类型
+     * @param {number} exerciseData.duration 运动时长(分钟)
+     * @param {number} exerciseData.caloriesBurned 消耗卡路里
+     * @param {string} exerciseData.dateRecorded 记录日期
+     * @param {string} exerciseData.notes 备注
+     * @returns {Promise} 添加结果
+     */
+    async addExerciseLog(exerciseData) {
+        try {
+            const response = await apiClient.post('/fitness/exercise/add', exerciseData)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 更新运动记录
+     * @param {Object} exerciseData 运动数据
+     * @param {number} exerciseData.id 记录ID
+     * @param {string} exerciseData.exerciseType 运动类型
+     * @param {number} exerciseData.duration 运动时长(分钟)
+     * @param {number} exerciseData.caloriesBurned 消耗卡路里
+     * @param {string} exerciseData.dateRecorded 记录日期
+     * @param {string} exerciseData.notes 备注
+     * @returns {Promise} 更新结果
+     */
+    async updateExerciseLog(exerciseData) {
+        try {
+            const response = await apiClient.post('/fitness/exercise/update', exerciseData)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 删除运动记录
+     * @param {number} id 记录ID
+     * @returns {Promise} 删除结果
+     */
+    async deleteExerciseLog(id) {
+        try {
+            const response = await apiClient.post('/fitness/exercise/delete', { id })
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 分页查询我的运动记录
+     * @param {Object} queryParams 查询参数
+     * @param {number} queryParams.current 当前页
+     * @param {number} queryParams.pageSize 页面大小
+     * @param {string} queryParams.exerciseType 运动类型
+     * @param {string} queryParams.startDate 开始日期
+     * @param {string} queryParams.endDate 结束日期
+     * @returns {Promise} 分页数据
+     */
+    async getMyExerciseLogByPage(queryParams) {
+        try {
+            const response = await apiClient.post('/fitness/exercise/my/list/page', queryParams)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 获取运动统计
+     * @param {number} days 天数，默认7天
+     * @returns {Promise} 统计数据
+     */
+    async getExerciseStats(days = 7) {
+        try {
+            const response = await apiClient.get(`/fitness/exercise/stats?days=${days}`)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 获取总卡路里消耗
+     * @param {number} days 天数，默认7天
+     * @returns {Promise} 卡路里数据
+     */
+    async getTotalCaloriesBurned(days = 7) {
+        try {
+            const response = await apiClient.get(`/fitness/exercise/calories?days=${days}`)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    // ==================== 训练计划管理 ====================
+
+    /**
+     * 创建训练计划
+     * @param {Object} planData 训练计划数据
+     * @param {string} planData.planName 计划名称
+     * @param {string} planData.planType 计划类型
+     * @param {string} planData.planDetails 计划详情(JSON格式)
+     * @param {number} planData.isDefault 是否默认计划(0/1)
+     * @param {string} planData.startDate 开始日期
+     * @param {string} planData.endDate 结束日期
+     * @returns {Promise} 创建结果
+     */
+    async addTrainingPlan(planData) {
+        try {
+            const response = await apiClient.post('/fitness/plan/add', planData)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 更新训练计划
+     * @param {Object} planData 训练计划数据
+     * @param {number} planData.id 计划ID
+     * @param {string} planData.planName 计划名称
+     * @param {string} planData.planType 计划类型
+     * @param {string} planData.planDetails 计划详情(JSON格式)
+     * @param {string} planData.startDate 开始日期
+     * @param {string} planData.endDate 结束日期
+     * @returns {Promise} 更新结果
+     */
+    async updateTrainingPlan(planData) {
+        try {
+            const response = await apiClient.post('/fitness/plan/update', planData)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 删除训练计划
+     * @param {number} id 计划ID
+     * @returns {Promise} 删除结果
+     */
+    async deleteTrainingPlan(id) {
+        try {
+            const response = await apiClient.post('/fitness/plan/delete', { id })
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 获取默认训练计划
+     * @returns {Promise} 默认计划列表
+     */
+    async getDefaultTrainingPlans() {
+        try {
+            const response = await apiClient.get('/fitness/plan/default')
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 分页查询我的训练计划
+     * @param {Object} queryParams 查询参数
+     * @param {number} queryParams.current 当前页
+     * @param {number} queryParams.pageSize 页面大小
+     * @param {string} queryParams.planType 计划类型
+     * @returns {Promise} 分页数据
+     */
+    async getMyTrainingPlanByPage(queryParams) {
+        try {
+            const response = await apiClient.post('/fitness/plan/my/list/page', queryParams)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    // ==================== 健身目标管理 ====================
+
+    /**
+     * 创建健身目标
+     * @param {Object} goalData 目标数据
+     * @param {string} goalData.goalType 目标类型
+     * @param {string} goalData.targetValue 目标值
+     * @param {string} goalData.startDate 开始日期
+     * @param {string} goalData.endDate 结束日期
+     * @returns {Promise} 创建结果
+     */
+    async addFitnessGoal(goalData) {
+        try {
+            const response = await apiClient.post('/fitness/goal/add', goalData)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 更新健身目标
+     * @param {Object} goalData 目标数据
+     * @param {number} goalData.id 目标ID
+     * @param {string} goalData.goalType 目标类型
+     * @param {string} goalData.targetValue 目标值
+     * @param {string} goalData.progress 进度(JSON格式)
+     * @param {number} goalData.isAchieved 是否达成(0/1)
+     * @returns {Promise} 更新结果
+     */
+    async updateFitnessGoal(goalData) {
+        try {
+            const response = await apiClient.post('/fitness/goal/update', goalData)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 删除健身目标
+     * @param {number} id 目标ID
+     * @returns {Promise} 删除结果
+     */
+    async deleteFitnessGoal(id) {
+        try {
+            const response = await apiClient.post('/fitness/goal/delete', { id })
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 获取进行中的健身目标
+     * @returns {Promise} 活跃目标列表
+     */
+    async getActiveFitnessGoals() {
+        try {
+            const response = await apiClient.get('/fitness/goal/active')
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 分页查询我的健身目标
+     * @param {Object} queryParams 查询参数
+     * @param {number} queryParams.current 当前页
+     * @param {number} queryParams.pageSize 页面大小
+     * @param {string} queryParams.goalType 目标类型
+     * @param {number} queryParams.isAchieved 是否达成(0/1)
+     * @returns {Promise} 分页数据
+     */
+    async getMyFitnessGoalByPage(queryParams) {
+        try {
+            const response = await apiClient.post('/fitness/goal/my/list/page', queryParams)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    // ==================== BMI计算相关 ====================
+
+    /**
+     * 计算BMI指数
+     * @param {Object} bmiData BMI计算数据
+     * @param {number} bmiData.weight 体重(kg)
+     * @param {number} bmiData.height 身高(cm)
+     * @returns {Promise} BMI计算结果
+     */
+    async calculateBMI(bmiData) {
+        try {
+            const response = await apiClient.post('/fitness/bmi/calculate', bmiData)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
     }
 }
 
-export default ApiService 
+export default ApiService
