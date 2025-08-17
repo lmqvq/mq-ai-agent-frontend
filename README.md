@@ -201,7 +201,7 @@ mq-ai-agent-frontend/
 
 1. **克隆项目**
    ```bash
-   git clone https://github.com/your-username/mq-ai-agent-frontend.git
+   git clone https://github.com/lmqvq/mq-ai-agent-frontend.git
    cd mq-ai-agent-frontend
    ```
 
@@ -359,7 +359,7 @@ const apiClient = axios.create({
 
 如果您发现了bug或有改进建议：
 
-1. 查看 [Issues](https://github.com/your-username/mq-ai-agent-frontend/issues) 确认问题未被报告
+1. 查看 [Issues](https://github.com/lmqvq/mq-ai-agent-frontend/issues) 确认问题未被报告
 2. 创建新的 Issue，详细描述问题
 3. 提供复现步骤和环境信息
 4. 如果可能，提供截图或错误日志
@@ -376,7 +376,7 @@ const apiClient = axios.create({
 
 1. **Fork 项目**
    ```bash
-   git clone https://github.com/your-username/mq-ai-agent-frontend.git
+   git clone https://github.com/lmqvq/mq-ai-agent-frontend.git
    ```
 
 2. **创建功能分支**
@@ -444,16 +444,16 @@ SOFTWARE.
 
 - 📖 [项目文档](docs/)
 - 🌟 [在线演示](https://cozi.chat/)
-- 🐛 [问题反馈](https://github.com/your-username/mq-ai-agent-frontend/issues)
-- 💬 [讨论区](https://github.com/your-username/mq-ai-agent-frontend/discussions)
-- 📧 [联系我们](mailto:your-email@example.com)
+- 🐛 [问题反馈](https://github.com/lmqvq/mq-ai-agent-frontend/issues)
+- 💬 [讨论区](https://github.com/lmqvq/mq-ai-agent-frontend/discussions)
+- 📧 [联系我们](mailto:2097489731@qq.com)
 
 ## 📊 项目统计
 
-![GitHub stars](https://img.shields.io/github/stars/your-username/mq-ai-agent-frontend?style=social)
-![GitHub forks](https://img.shields.io/github/forks/your-username/mq-ai-agent-frontend?style=social)
-![GitHub issues](https://img.shields.io/github/issues/your-username/mq-ai-agent-frontend)
-![GitHub license](https://img.shields.io/github/license/your-username/mq-ai-agent-frontend)
+![GitHub stars](https://img.shields.io/github/stars/lmqvq/mq-ai-agent-frontend?style=social)
+![GitHub forks](https://img.shields.io/github/forks/lmqvq/mq-ai-agent-frontend?style=social)
+![GitHub issues](https://img.shields.io/github/issues/lmqvq/mq-ai-agent-frontend)
+![GitHub license](https://img.shields.io/github/license/lmqvq/mq-ai-agent-frontend)
 
 ---
 

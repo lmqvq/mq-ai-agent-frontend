@@ -8,7 +8,7 @@
 
 如果您发现了 bug 或有改进建议：
 
-1. 查看 [Issues](https://github.com/your-username/mq-ai-agent-frontend/issues) 确认问题未被报告
+1. 查看 [Issues](https://github.com/lmqvq/mq-ai-agent-frontend/issues) 确认问题未被报告
 2. 创建新的 Issue，详细描述问题
 3. 提供复现步骤和环境信息
 4. 如果可能，提供截图或错误日志
@@ -25,7 +25,7 @@
 
 1. **Fork 项目**
    ```bash
-   git clone https://github.com/your-username/mq-ai-agent-frontend.git
+   git clone https://github.com/lmqvq/mq-ai-agent-frontend.git
    cd mq-ai-agent-frontend
    ```
 
@@ -162,7 +162,7 @@ src/
 
 如果您有任何问题或建议，可以通过以下方式联系我们：
 
-- 创建 [Issue](https://github.com/your-username/mq-ai-agent-frontend/issues)
-- 发送邮件至 [your-email@example.com](mailto:your-email@example.com)
+- 创建 [Issue](https://github.com/lmqvq/mq-ai-agent-frontend/issues)
+- 发送邮件至 [2097489731@qq.com](mailto:2097489731@qq.com)
 
 再次感谢您的贡献！🎉

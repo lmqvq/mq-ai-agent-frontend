@@ -23,6 +23,10 @@
           <icon-user />
           <span>个人中心</span>
         </router-link>
+        <router-link to="/management" class="menu-item" active-class="active" v-if="isLoggedIn">
+          <icon-dashboard />
+          <span>健身管理</span>
+        </router-link>
         <router-link to="/data" class="menu-item" active-class="active" v-if="isLoggedIn">
           <icon-bar-chart />
           <span>健身数据</span>
@@ -157,7 +161,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import AppCard from '@/components/AppCard.vue';
 import {
-  IconHome, IconUser, IconBarChart, IconCalendar, IconTrophy,
+  IconHome, IconUser, IconBarChart, IconCalendar, IconTrophy, IconDashboard,
   IconFire, IconClockCircle, IconHeart, IconBook, IconEdit, IconPoweroff, IconRobot
 } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
@@ -172,6 +176,7 @@ export default {
     IconBarChart,
     IconCalendar,
     IconTrophy,
+    IconDashboard,
     IconFire,
     IconClockCircle,
     IconHeart,

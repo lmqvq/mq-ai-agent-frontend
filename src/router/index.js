@@ -43,6 +43,14 @@ const routes = [
         }
     },
     {
+        path: '/management',
+        name: 'FitnessManagement',
+        component: () => import('../views/FitnessManagement.vue'),
+        meta: {
+            title: '健身管理中心 - AI健身教练'
+        }
+    },
+    {
         path: '/plans',
         name: 'FitnessPlans',
         component: () => import('../views/FitnessPlans.vue'),
