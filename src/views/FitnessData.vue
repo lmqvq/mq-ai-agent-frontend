@@ -30,20 +30,20 @@
             </div>
           </div>
         </div>
-        
+
         <div class="overview-card">
           <div class="card-icon bodyfat">
             <icon-heart />
           </div>
           <div class="card-content">
-            <h3>体脂率</h3>
+            <h3>当前体脂率</h3>
             <div class="value">{{ currentData.bodyFat || '--' }} <span>%</span></div>
             <div class="change" :class="bodyFatChange.type">
               {{ bodyFatChange.text }}
             </div>
           </div>
         </div>
-        
+
         <div class="overview-card">
           <div class="card-icon bmi">
             <icon-dashboard />
@@ -56,16 +56,16 @@
             </div>
           </div>
         </div>
-        
+
         <div class="overview-card">
-          <div class="card-icon muscle">
+          <div class="card-icon height">
             <icon-trophy />
           </div>
           <div class="card-content">
-            <h3>肌肉量</h3>
-            <div class="value">{{ currentData.muscle || '--' }} <span>kg</span></div>
-            <div class="change" :class="muscleChange.type">
-              {{ muscleChange.text }}
+            <h3>当前身高</h3>
+            <div class="value">{{ currentData.height || '--' }} <span>cm</span></div>
+            <div class="change">
+              基础数据
             </div>
           </div>
         </div>
@@ -85,7 +85,7 @@
               </a-radio-group>
             </div>
           </div>
-          <div class="chart-container" ref="weightChart"></div>
+          <div class="chart-container weight-chart"></div>
         </div>
         
         <div class="chart-card">
@@ -100,7 +100,7 @@
               </a-radio-group>
             </div>
           </div>
-          <div class="chart-container" ref="bodyFatChart"></div>
+          <div class="chart-container bodyfat-chart"></div>
         </div>
       </div>
 
@@ -189,27 +189,51 @@
     <!-- 添加健身数据弹窗 -->
     <a-modal v-model:visible="showDataModal" title="添加健身数据" @ok="saveData">
       <a-form :model="dataForm" layout="vertical">
-        <a-form-item label="体重(kg)">
+        <a-form-item label="性别" required>
+          <a-radio-group v-model="dataForm.gender" @change="calculateBodyFatPercentage">
+            <a-radio value="男">男</a-radio>
+            <a-radio value="女">女</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item label="年龄" required>
           <a-input-number
-            v-model="dataForm.weight"
-            placeholder="输入体重"
-            :precision="1"
+            v-model="dataForm.age"
+            placeholder="输入年龄"
             :min="1"
-            @change="calculateBMIRealtime"
+            :max="150"
+            @change="calculateBodyFatPercentage"
           />
         </a-form-item>
-        <a-form-item label="体脂率(%)">
-          <a-input-number v-model="dataForm.bodyFat" placeholder="输入体脂率" :precision="1" :min="1" :max="50" />
-        </a-form-item>
-        <a-form-item label="身高(cm)">
+        <a-form-item label="身高(cm)" required>
           <a-input-number
             v-model="dataForm.height"
             placeholder="输入身高"
             :precision="1"
             :min="100"
             :max="250"
-            @change="calculateBMIRealtime"
+            @change="calculateBodyFatPercentage"
           />
+        </a-form-item>
+        <a-form-item label="体重(kg)" required>
+          <a-input-number
+            v-model="dataForm.weight"
+            placeholder="输入体重"
+            :precision="1"
+            :min="1"
+            @change="calculateBodyFatPercentage"
+          />
+        </a-form-item>
+        <a-form-item label="体脂率(%)">
+          <a-input-number 
+            v-model="dataForm.bodyFat" 
+            placeholder="自动计算" 
+            :precision="1" 
+            :min="1" 
+            :max="50"
+            disabled
+            readonly
+          />
+          <div class="helper-text">根据性别、年龄、身高、体重自动计算</div>
         </a-form-item>
 
         <!-- BMI计算结果显示区域 -->
@@ -244,12 +268,13 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, nextTick, watch } from 'vue';
 import { Message } from '@arco-design/web-vue';
 import {
   IconBarChart, IconUser, IconHeart, IconDashboard, IconTrophy,
   IconFire, IconPlus, IconEdit, IconDelete
 } from '@arco-design/web-vue/es/icon';
+import * as echarts from 'echarts';
 import ApiService from '@/services/api';
 
 export default {
@@ -274,6 +299,10 @@ export default {
 
     const weightPeriod = ref('30d');
     const bodyFatPeriod = ref('30d');
+    
+    // 图表实例
+    let weightChartInstance = null;
+    let bodyFatChartInstance = null;
 
     const workoutStats = ref({
       thisWeek: 0,
@@ -297,15 +326,25 @@ export default {
     });
 
     const dataForm = reactive({
+      gender: '',
+      age: null,
+      height: null,
       weight: null,
       bodyFat: null,
-      height: null,
       dateRecorded: new Date().toISOString().split('T')[0]
     });
 
     // BMI计算相关数据
     const bmiResult = ref(null);
     const bmiCalculating = ref(false);
+
+    // 监听弹窗打开/关闭
+    watch(showDataModal, (newVal) => {
+      if (!newVal) {
+        // 弹窗关闭时，重置BMI结果
+        bmiResult.value = null;
+      }
+    });
 
     // API调用方法
     const loadFitnessData = async () => {
@@ -461,14 +500,291 @@ export default {
       }
     };
 
-    const updateWeightChart = () => {
-      // 这里应该根据选择的时间段更新图表数据
-      console.log('更新体重图表:', weightPeriod.value);
+    // 计算体脂率
+    const calculateBodyFatPercentage = () => {
+      // 检查是否所有必要数据都已输入
+      if (!dataForm.gender || !dataForm.age || !dataForm.height || !dataForm.weight) {
+        dataForm.bodyFat = null;
+        return;
+      }
+
+      // 计算BMI
+      const heightInMeters = dataForm.height / 100;
+      const bmi = dataForm.weight / (heightInMeters * heightInMeters);
+
+      let bodyFatPercentage = 0;
+
+      // 判断是否为未成年（周岁年龄小于18岁）
+      const isMinor = dataForm.age < 18;
+
+      if (isMinor) {
+        // 未成年计算公式
+        if (dataForm.gender === '男') {
+          // 未成年男性：体脂率（BFP） = 1.51 × BMI - 0.70 × 年龄 - 2.2
+          bodyFatPercentage = 1.51 * bmi - 0.70 * dataForm.age - 2.2;
+        } else {
+          // 未成年女性：体脂率（BFP） = 1.51 × BMI - 0.70 × 年龄 + 1.4
+          bodyFatPercentage = 1.51 * bmi - 0.70 * dataForm.age + 1.4;
+        }
+      } else {
+        // 成年计算公式
+        if (dataForm.gender === '男') {
+          // 成年男性：体脂率（BFP） = 1.20 × BMI + 0.23 × 年龄 - 16.2
+          bodyFatPercentage = 1.20 * bmi + 0.23 * dataForm.age - 16.2;
+        } else {
+          // 成年女性：体脂率（BFP） = 1.20 × BMI + 0.23 × 年龄 - 5.4
+          bodyFatPercentage = 1.20 * bmi + 0.23 * dataForm.age - 5.4;
+        }
+      }
+
+      // 确保体脂率在合理范围内（1%-50%）
+      bodyFatPercentage = Math.max(1, Math.min(50, bodyFatPercentage));
+
+      // 保留一位小数
+      dataForm.bodyFat = parseFloat(bodyFatPercentage.toFixed(1));
+
+      // 同时触发BMI计算
+      calculateBMIRealtime();
     };
 
-    const updateBodyFatChart = () => {
-      // 这里应该根据选择的时间段更新图表数据
-      console.log('更新体脂率图表:', bodyFatPeriod.value);
+    // 初始化体重图表
+    const initWeightChart = async () => {
+      try {
+        const chartDom = document.querySelector('.weight-chart');
+        if (!chartDom) return;
+        
+        if (weightChartInstance) {
+          weightChartInstance.dispose();
+        }
+        
+        weightChartInstance = echarts.init(chartDom);
+        
+        // 根据时间段获取天数
+        const daysMap = {
+          '7d': 7,
+          '30d': 30,
+          '90d': 90,
+          '1y': 365
+        };
+        const days = daysMap[weightPeriod.value] || 30;
+        
+        // 获取趋势数据
+        const response = await ApiService.getFitnessTrends(days);
+        
+        if (response.code === 0 && response.data && response.data.length > 0) {
+          const dates = [];
+          const weights = [];
+          
+          // 按日期排序
+          response.data.sort((a, b) => new Date(a.dateRecorded) - new Date(b.dateRecorded));
+          
+          response.data.forEach(item => {
+            if (item.weight) {
+              dates.push(new Date(item.dateRecorded).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }));
+              weights.push(item.weight);
+            }
+          });
+          
+          const option = {
+            title: {
+              text: '',
+              left: 'center'
+            },
+            tooltip: {
+              trigger: 'axis',
+              formatter: '{b}<br/>体重: {c} kg'
+            },
+            grid: {
+              left: '3%',
+              right: '4%',
+              bottom: '3%',
+              top: '10%',
+              containLabel: true
+            },
+            xAxis: {
+              type: 'category',
+              boundaryGap: false,
+              data: dates,
+              axisLabel: {
+                rotate: 45
+              }
+            },
+            yAxis: {
+              type: 'value',
+              name: '体重(kg)',
+              min: function(value) {
+                return Math.floor(value.min - 2);
+              },
+              max: function(value) {
+                return Math.ceil(value.max + 2);
+              }
+            },
+            series: [
+              {
+                name: '体重',
+                type: 'line',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 8,
+                data: weights,
+                itemStyle: {
+                  color: '#4080ff'
+                },
+                areaStyle: {
+                  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: 'rgba(64, 128, 255, 0.3)' },
+                    { offset: 1, color: 'rgba(64, 128, 255, 0.05)' }
+                  ])
+                }
+              }
+            ]
+          };
+          
+          weightChartInstance.setOption(option);
+        } else {
+          // 显示无数据提示
+          const option = {
+            title: {
+              text: '暂无数据',
+              left: 'center',
+              top: 'center',
+              textStyle: {
+                color: '#999',
+                fontSize: 14
+              }
+            }
+          };
+          weightChartInstance.setOption(option);
+        }
+      } catch (error) {
+        console.error('初始化体重图表失败:', error);
+        Message.error('加载体重趋势图失败');
+      }
+    };
+    
+    // 初始化体脂率图表
+    const initBodyFatChart = async () => {
+      try {
+        const chartDom = document.querySelector('.bodyfat-chart');
+        if (!chartDom) return;
+        
+        if (bodyFatChartInstance) {
+          bodyFatChartInstance.dispose();
+        }
+        
+        bodyFatChartInstance = echarts.init(chartDom);
+        
+        // 根据时间段获取天数
+        const daysMap = {
+          '7d': 7,
+          '30d': 30,
+          '90d': 90,
+          '1y': 365
+        };
+        const days = daysMap[bodyFatPeriod.value] || 30;
+        
+        // 获取趋势数据
+        const response = await ApiService.getFitnessTrends(days);
+        
+        if (response.code === 0 && response.data && response.data.length > 0) {
+          const dates = [];
+          const bodyFats = [];
+          
+          // 按日期排序
+          response.data.sort((a, b) => new Date(a.dateRecorded) - new Date(b.dateRecorded));
+          
+          response.data.forEach(item => {
+            if (item.bodyFat) {
+              dates.push(new Date(item.dateRecorded).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }));
+              bodyFats.push(item.bodyFat);
+            }
+          });
+          
+          const option = {
+            title: {
+              text: '',
+              left: 'center'
+            },
+            tooltip: {
+              trigger: 'axis',
+              formatter: '{b}<br/>体脂率: {c}%'
+            },
+            grid: {
+              left: '3%',
+              right: '4%',
+              bottom: '3%',
+              top: '10%',
+              containLabel: true
+            },
+            xAxis: {
+              type: 'category',
+              boundaryGap: false,
+              data: dates,
+              axisLabel: {
+                rotate: 45
+              }
+            },
+            yAxis: {
+              type: 'value',
+              name: '体脂率(%)',
+              min: function(value) {
+                return Math.floor(value.min - 2);
+              },
+              max: function(value) {
+                return Math.ceil(value.max + 2);
+              }
+            },
+            series: [
+              {
+                name: '体脂率',
+                type: 'line',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 8,
+                data: bodyFats,
+                itemStyle: {
+                  color: '#f53f3f'
+                },
+                areaStyle: {
+                  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: 'rgba(245, 63, 63, 0.3)' },
+                    { offset: 1, color: 'rgba(245, 63, 63, 0.05)' }
+                  ])
+                }
+              }
+            ]
+          };
+          
+          bodyFatChartInstance.setOption(option);
+        } else {
+          // 显示无数据提示
+          const option = {
+            title: {
+              text: '暂无数据',
+              left: 'center',
+              top: 'center',
+              textStyle: {
+                color: '#999',
+                fontSize: 14
+              }
+            }
+          };
+          bodyFatChartInstance.setOption(option);
+        }
+      } catch (error) {
+        console.error('初始化体脂率图表失败:', error);
+        Message.error('加载体脂率趋势图失败');
+      }
+    };
+
+    const updateWeightChart = async () => {
+      await nextTick();
+      await initWeightChart();
+    };
+
+    const updateBodyFatChart = async () => {
+      await nextTick();
+      await initBodyFatChart();
     };
 
     const saveWorkout = async () => {
@@ -530,6 +846,28 @@ export default {
 
     const saveData = async () => {
       try {
+        // 验证必填字段
+        if (!dataForm.gender) {
+          Message.warning('请选择性别');
+          return;
+        }
+        if (!dataForm.age) {
+          Message.warning('请输入年龄');
+          return;
+        }
+        if (!dataForm.height) {
+          Message.warning('请输入身高');
+          return;
+        }
+        if (!dataForm.weight) {
+          Message.warning('请输入体重');
+          return;
+        }
+        if (!dataForm.bodyFat) {
+          Message.warning('体脂率未计算，请确保所有数据填写完整');
+          return;
+        }
+
         const fitnessData = {
           weight: dataForm.weight,
           bodyFat: dataForm.bodyFat,
@@ -546,13 +884,18 @@ export default {
           Object.keys(dataForm).forEach(key => {
             if (key === 'dateRecorded') {
               dataForm[key] = new Date().toISOString().split('T')[0];
+            } else if (key === 'gender') {
+              dataForm[key] = '';
             } else {
               dataForm[key] = null;
             }
           });
 
-          // 重新加载数据
+          // 重新加载数据和图表
           await loadFitnessData();
+          await nextTick();
+          await initWeightChart();
+          await initBodyFatChart();
         } else {
           Message.error(response.message || '添加健身数据失败');
         }
@@ -568,6 +911,17 @@ export default {
         loadFitnessData(),
         loadExerciseData()
       ]);
+      
+      // 初始化图表
+      await nextTick();
+      await initWeightChart();
+      await initBodyFatChart();
+      
+      // 监听窗口大小变化
+      window.addEventListener('resize', () => {
+        weightChartInstance?.resize();
+        bodyFatChartInstance?.resize();
+      });
     });
 
     return {
@@ -591,6 +945,10 @@ export default {
       getBMIStatusText,
       getBMIStatusClass,
       calculateBMIRealtime,
+      calculateBodyFatPercentage,
+      // 图表相关
+      initWeightChart,
+      initBodyFatChart,
       // 其他方法
       getWorkoutIcon,
       formatDate,
@@ -660,7 +1018,7 @@ export default {
 .overview-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 24px;
   margin-bottom: 32px;
 }
 
@@ -707,6 +1065,10 @@ export default {
 
     &.muscle {
       background: linear-gradient(45deg, #ff7d00, #ffa940);
+    }
+    
+    &.height {
+      background: linear-gradient(45deg, #722ed1, #9254de);
     }
   }
 
@@ -795,14 +1157,8 @@ export default {
   }
 
   .chart-container {
-    height: 300px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    font-size: 14px;
+    height: 320px;
+    width: 100%;
   }
 }
 
@@ -919,6 +1275,14 @@ export default {
       }
     }
   }
+}
+
+// 辅助文本样式
+.helper-text {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #86909c;
+  line-height: 1.5;
 }
 
 // BMI结果显示样式
