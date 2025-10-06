@@ -158,8 +158,18 @@
     <!-- 添加运动记录弹窗 -->
     <a-modal v-model:visible="showWorkoutModal" title="添加运动记录" @ok="saveWorkout">
       <a-form :model="workoutForm" layout="vertical">
+        <a-form-item label="体重(kg)" required>
+          <a-input-number 
+            v-model="workoutForm.weight" 
+            placeholder="输入当前体重" 
+            :precision="1"
+            :min="1" 
+            @change="calculateCalories"
+          />
+          <div class="helper-text">用于计算消耗的卡路里</div>
+        </a-form-item>
         <a-form-item label="运动类型" required>
-          <a-select v-model="workoutForm.exerciseType" placeholder="选择运动类型">
+          <a-select v-model="workoutForm.exerciseType" placeholder="选择运动类型" @change="calculateCalories">
             <a-option value="跑步">跑步</a-option>
             <a-option value="骑行">骑行</a-option>
             <a-option value="游泳">游泳</a-option>
@@ -168,14 +178,30 @@
             <a-option value="篮球">篮球</a-option>
             <a-option value="足球">足球</a-option>
             <a-option value="羽毛球">羽毛球</a-option>
+            <a-option value="散步">散步</a-option>
+            <a-option value="爬楼梯">爬楼梯</a-option>
+            <a-option value="慢跑">慢跑</a-option>
+            <a-option value="快跑">快跑</a-option>
             <a-option value="其他">其他</a-option>
           </a-select>
         </a-form-item>
         <a-form-item label="运动时长(分钟)" required>
-          <a-input-number v-model="workoutForm.duration" placeholder="输入运动时长" :min="1" />
+          <a-input-number 
+            v-model="workoutForm.duration" 
+            placeholder="输入运动时长" 
+            :min="1" 
+            @change="calculateCalories"
+          />
         </a-form-item>
-        <a-form-item label="消耗卡路里" required>
-          <a-input-number v-model="workoutForm.caloriesBurned" placeholder="输入消耗的卡路里" :min="1" />
+        <a-form-item label="消耗卡路里">
+          <a-input-number 
+            v-model="workoutForm.caloriesBurned" 
+            placeholder="自动计算" 
+            :min="1"
+            disabled
+            readonly
+          />
+          <div class="helper-text">根据运动类型、体重、时长自动计算</div>
         </a-form-item>
         <a-form-item label="运动日期" required>
           <a-date-picker v-model="workoutForm.dateRecorded" style="width: 100%" value-format="YYYY-MM-DD" />
@@ -318,6 +344,7 @@ export default {
     const showDataModal = ref(false);
 
     const workoutForm = reactive({
+      weight: null,
       exerciseType: '',
       duration: null,
       caloriesBurned: null,
@@ -383,11 +410,12 @@ export default {
       try {
         const response = await ApiService.getMyExerciseLogByPage({
           current: 1,
-          pageSize: 10
+          pageSize: 100  // 获取更多数据用于统计
         });
 
         if (response.code === 0 && response.data?.records) {
-          recentWorkouts.value = response.data.records.map(item => ({
+          const records = response.data.records;
+          recentWorkouts.value = records.slice(0, 10).map(item => ({
             id: item.id,
             type: item.exerciseType,
             name: item.exerciseType,
@@ -396,22 +424,74 @@ export default {
             date: new Date(item.dateRecorded),
             notes: item.notes || ''
           }));
-        }
 
-        // 加载运动统计
-        const statsResponse = await ApiService.getExerciseStats(30);
-        if (statsResponse.code === 0) {
+          // 自己计算运动统计
+          calculateWorkoutStats(records);
+        } else {
+          recentWorkouts.value = [];
           workoutStats.value = {
-            thisWeek: statsResponse.data.weeklyCount || 0,
-            thisMonth: statsResponse.data.monthlyCount || 0,
-            totalCalories: statsResponse.data.totalCalories || 0,
-            avgDuration: statsResponse.data.avgDuration || 0
+            thisWeek: 0,
+            thisMonth: 0,
+            totalCalories: 0,
+            avgDuration: 0
           };
         }
       } catch (error) {
         console.error('加载运动数据失败:', error);
-        Message.error('加载运动数据失败');
+        // 不显示错误提示，只记录日志
+        recentWorkouts.value = [];
+        workoutStats.value = {
+          thisWeek: 0,
+          thisMonth: 0,
+          totalCalories: 0,
+          avgDuration: 0
+        };
       }
+    };
+
+    // 计算运动统计
+    const calculateWorkoutStats = (records) => {
+      if (!records || records.length === 0) {
+        workoutStats.value = {
+          thisWeek: 0,
+          thisMonth: 0,
+          totalCalories: 0,
+          avgDuration: 0
+        };
+        return;
+      }
+
+      const now = new Date();
+      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+      let weekCount = 0;
+      let monthCount = 0;
+      let totalCalories = 0;
+      let totalDuration = 0;
+
+      records.forEach(record => {
+        const recordDate = new Date(record.dateRecorded);
+        
+        if (recordDate >= oneWeekAgo) {
+          weekCount++;
+        }
+        if (recordDate >= oneMonthAgo) {
+          monthCount++;
+        }
+        
+        totalCalories += record.caloriesBurned || 0;
+        totalDuration += record.duration || 0;
+      });
+
+      const avgDuration = records.length > 0 ? Math.round(totalDuration / records.length) : 0;
+
+      workoutStats.value = {
+        thisWeek: weekCount,
+        thisMonth: monthCount,
+        totalCalories: Math.round(totalCalories),
+        avgDuration: avgDuration
+      };
     };
 
     const calculateChanges = (current, previous) => {
@@ -498,6 +578,43 @@ export default {
       } else {
         bmiResult.value = null;
       }
+    };
+
+    // 计算运动消耗的卡路里
+    const calculateCalories = () => {
+      // 检查是否所有必要数据都已输入
+      if (!workoutForm.weight || !workoutForm.exerciseType || !workoutForm.duration) {
+        workoutForm.caloriesBurned = null;
+        return;
+      }
+
+      // 各种运动的MET值（代谢当量）
+      // 参考：https://tools-moah.app/zh/health-lab/exercise-calorie-calculator
+      const metValues = {
+        '跑步': 8.0,
+        '快跑': 10.0,
+        '慢跑': 6.0,
+        '骑行': 7.5,
+        '游泳': 8.0,
+        '力量训练': 6.0,
+        '瑜伽': 3.0,
+        '篮球': 6.5,
+        '足球': 7.0,
+        '羽毛球': 5.5,
+        '散步': 3.5,
+        '爬楼梯': 8.0,
+        '其他': 5.0
+      };
+
+      const met = metValues[workoutForm.exerciseType] || 5.0;
+      
+      // 卡路里计算公式：消耗的卡路里 = MET × 体重(kg) × 时间(小时)
+      // 注意：时长需要从分钟转换为小时
+      const hours = workoutForm.duration / 60;
+      const calories = met * workoutForm.weight * hours;
+
+      // 四舍五入到整数
+      workoutForm.caloriesBurned = Math.round(calories);
     };
 
     // 计算体脂率
@@ -789,6 +906,24 @@ export default {
 
     const saveWorkout = async () => {
       try {
+        // 验证必填字段
+        if (!workoutForm.weight) {
+          Message.warning('请输入体重');
+          return;
+        }
+        if (!workoutForm.exerciseType) {
+          Message.warning('请选择运动类型');
+          return;
+        }
+        if (!workoutForm.duration) {
+          Message.warning('请输入运动时长');
+          return;
+        }
+        if (!workoutForm.caloriesBurned) {
+          Message.warning('卡路里未计算，请确保所有数据填写完整');
+          return;
+        }
+
         const exerciseData = {
           exerciseType: workoutForm.exerciseType,
           duration: workoutForm.duration,
@@ -806,10 +941,8 @@ export default {
           Object.keys(workoutForm).forEach(key => {
             if (key === 'dateRecorded') {
               workoutForm[key] = new Date().toISOString().split('T')[0];
-            } else if (typeof workoutForm[key] === 'number') {
-              workoutForm[key] = null;
             } else {
-              workoutForm[key] = '';
+              workoutForm[key] = null;
             }
           });
 
@@ -946,6 +1079,8 @@ export default {
       getBMIStatusClass,
       calculateBMIRealtime,
       calculateBodyFatPercentage,
+      calculateCalories,
+      calculateWorkoutStats,
       // 图表相关
       initWeightChart,
       initBodyFatChart,
