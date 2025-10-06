@@ -1103,7 +1103,7 @@ export default {
 <style lang="scss" scoped>
 .fitness-data {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ffffff;
   padding: 20px;
   padding-bottom: 80px;
 }
@@ -1115,7 +1115,7 @@ export default {
 
 .page-header {
   margin-bottom: 32px;
-  color: white;
+  color: #333;
 
   .header-content {
     display: flex;
