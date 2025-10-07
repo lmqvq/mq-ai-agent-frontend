@@ -192,11 +192,12 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, nextTick } from 'vue';
 import {
   IconUser, IconCamera, IconPlus, IconHeart, IconUpload
 } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
+import * as echarts from 'echarts';
 import ApiService from '@/services/api';
 import { useUserStore } from '@/stores/user';
 
@@ -222,6 +223,12 @@ export default {
       bmi: null,
       height: null
     });
+
+    // 图表ref
+    const weightChart = ref(null);
+    const bodyFatChart = ref(null);
+    let weightChartInstance = null;
+    let bodyFatChartInstance = null;
 
     // 弹窗控制
     const showDataModal = ref(false);
@@ -623,6 +630,210 @@ export default {
       }
     };
 
+    // 初始化体重图表
+    const initWeightChart = async () => {
+      try {
+        await nextTick();
+        if (!weightChart.value) return;
+        
+        if (weightChartInstance) {
+          weightChartInstance.dispose();
+        }
+        
+        weightChartInstance = echarts.init(weightChart.value);
+        
+        // 获取趋势数据
+        const response = await ApiService.getFitnessTrends(30);
+        
+        if (response.code === 0 && response.data && response.data.length > 0) {
+          const dates = [];
+          const weights = [];
+          
+          // 按日期排序
+          response.data.sort((a, b) => new Date(a.dateRecorded) - new Date(b.dateRecorded));
+          
+          response.data.forEach(item => {
+            if (item.weight) {
+              dates.push(new Date(item.dateRecorded).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }));
+              weights.push(item.weight);
+            }
+          });
+          
+          const option = {
+            tooltip: {
+              trigger: 'axis',
+              formatter: '{b}<br/>体重: {c} kg'
+            },
+            grid: {
+              left: '3%',
+              right: '4%',
+              bottom: '3%',
+              top: '10%',
+              containLabel: true
+            },
+            xAxis: {
+              type: 'category',
+              boundaryGap: false,
+              data: dates,
+              axisLabel: {
+                rotate: 45,
+                fontSize: 11
+              }
+            },
+            yAxis: {
+              type: 'value',
+              name: '体重(kg)',
+              min: function(value) {
+                return Math.floor(value.min - 2);
+              },
+              max: function(value) {
+                return Math.ceil(value.max + 2);
+              }
+            },
+            series: [
+              {
+                name: '体重',
+                type: 'line',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 6,
+                data: weights,
+                itemStyle: {
+                  color: '#667eea'
+                },
+                areaStyle: {
+                  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: 'rgba(102, 126, 234, 0.3)' },
+                    { offset: 1, color: 'rgba(102, 126, 234, 0.05)' }
+                  ])
+                }
+              }
+            ]
+          };
+          
+          weightChartInstance.setOption(option);
+        } else {
+          // 显示无数据提示
+          const option = {
+            title: {
+              text: '暂无数据',
+              left: 'center',
+              top: 'center',
+              textStyle: {
+                color: '#999',
+                fontSize: 14
+              }
+            }
+          };
+          weightChartInstance.setOption(option);
+        }
+      } catch (error) {
+        console.error('初始化体重图表失败:', error);
+      }
+    };
+
+    // 初始化体脂率图表
+    const initBodyFatChart = async () => {
+      try {
+        await nextTick();
+        if (!bodyFatChart.value) return;
+        
+        if (bodyFatChartInstance) {
+          bodyFatChartInstance.dispose();
+        }
+        
+        bodyFatChartInstance = echarts.init(bodyFatChart.value);
+        
+        // 获取趋势数据
+        const response = await ApiService.getFitnessTrends(30);
+        
+        if (response.code === 0 && response.data && response.data.length > 0) {
+          const dates = [];
+          const bodyFats = [];
+          
+          // 按日期排序
+          response.data.sort((a, b) => new Date(a.dateRecorded) - new Date(b.dateRecorded));
+          
+          response.data.forEach(item => {
+            if (item.bodyFat) {
+              dates.push(new Date(item.dateRecorded).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }));
+              bodyFats.push(item.bodyFat);
+            }
+          });
+          
+          const option = {
+            tooltip: {
+              trigger: 'axis',
+              formatter: '{b}<br/>体脂率: {c}%'
+            },
+            grid: {
+              left: '3%',
+              right: '4%',
+              bottom: '3%',
+              top: '10%',
+              containLabel: true
+            },
+            xAxis: {
+              type: 'category',
+              boundaryGap: false,
+              data: dates,
+              axisLabel: {
+                rotate: 45,
+                fontSize: 11
+              }
+            },
+            yAxis: {
+              type: 'value',
+              name: '体脂率(%)',
+              min: function(value) {
+                return Math.floor(value.min - 2);
+              },
+              max: function(value) {
+                return Math.ceil(value.max + 2);
+              }
+            },
+            series: [
+              {
+                name: '体脂率',
+                type: 'line',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 6,
+                data: bodyFats,
+                itemStyle: {
+                  color: '#764ba2'
+                },
+                areaStyle: {
+                  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: 'rgba(118, 75, 162, 0.3)' },
+                    { offset: 1, color: 'rgba(118, 75, 162, 0.05)' }
+                  ])
+                }
+              }
+            ]
+          };
+          
+          bodyFatChartInstance.setOption(option);
+        } else {
+          // 显示无数据提示
+          const option = {
+            title: {
+              text: '暂无数据',
+              left: 'center',
+              top: 'center',
+              textStyle: {
+                color: '#999',
+                fontSize: 14
+              }
+            }
+          };
+          bodyFatChartInstance.setOption(option);
+        }
+      } catch (error) {
+        console.error('初始化体脂率图表失败:', error);
+      }
+    };
+
     // 生命周期
     onMounted(async () => {
       try {
@@ -630,7 +841,17 @@ export default {
         // 串行加载，确保每个请求都完成
         await loadFitnessData();
         await loadExerciseStats();
+        // 初始化图表
+        await nextTick();
+        await initWeightChart();
+        await initBodyFatChart();
         console.log('所有数据加载完成');
+
+        // 监听窗口大小变化
+        window.addEventListener('resize', () => {
+          weightChartInstance?.resize();
+          bodyFatChartInstance?.resize();
+        });
       } catch (error) {
         console.error('数据加载错误:', error);
       }
@@ -643,6 +864,9 @@ export default {
       showDataModal,
       showAvatarUpload,
       bodyDataForm,
+      // 图表ref
+      weightChart,
+      bodyFatChart,
       // 头像上传相关
       fileList,
       previewUrl,
