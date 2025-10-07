@@ -23,17 +23,9 @@
           <icon-user />
           <span>个人中心</span>
         </router-link>
-        <router-link to="/management" class="menu-item" active-class="active" v-if="isLoggedIn">
-          <icon-dashboard />
-          <span>健身管理</span>
-        </router-link>
         <router-link to="/data" class="menu-item" active-class="active" v-if="isLoggedIn">
           <icon-bar-chart />
           <span>健身数据</span>
-        </router-link>
-        <router-link to="/plans" class="menu-item" active-class="active" v-if="isLoggedIn">
-          <icon-calendar />
-          <span>健身计划</span>
         </router-link>
         <router-link to="/knowledge" class="menu-item" active-class="active">
           <icon-book />
@@ -161,7 +153,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import AppCard from '@/components/AppCard.vue';
 import {
-  IconHome, IconUser, IconBarChart, IconCalendar, IconTrophy, IconDashboard,
+  IconHome, IconUser, IconBarChart, IconTrophy,
   IconFire, IconClockCircle, IconHeart, IconBook, IconEdit, IconPoweroff, IconRobot
 } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
@@ -174,9 +166,7 @@ export default {
     IconHome,
     IconUser,
     IconBarChart,
-    IconCalendar,
     IconTrophy,
-    IconDashboard,
     IconFire,
     IconClockCircle,
     IconHeart,
@@ -209,14 +199,14 @@ export default {
         route: '/agent',
         bgColor: 'rgba(218, 243, 243, 0.5)'
       },
-      {
-        id: 'plans',
-        title: '个性化健身计划',
-        description: 'AI为您量身定制专业健身计划，科学训练，高效达成目标',
-        icon: 'icon-calendar',
-        route: '/plans',
-        bgColor: 'rgba(230, 247, 255, 0.5)'
-      },
+      // {
+      //   id: 'plans',
+      //   title: '个性化健身计划',
+      //   description: 'AI为您量身定制专业健身计划，科学训练，高效达成目标',
+      //   icon: 'icon-calendar',
+      //   route: '/plans',
+      //   bgColor: 'rgba(230, 247, 255, 0.5)'
+      // },
       {
         id: 'data',
         title: '健身数据中心',
@@ -309,19 +299,34 @@ export default {
   display: flex;
   height: 100vh;
   width: 100%;
-  background-color: #f9fafc;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(64, 128, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(64, 169, 255, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
 }
 
 .sidebar {
   width: 200px;
-  background: #fff;
-  border-right: 1px solid #eaedf1;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(255, 255, 255, 0.5);
   height: 100%;
   padding: 20px 0;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.03);
+  box-shadow: 4px 0 20px rgba(0,0,0,0.05);
   position: relative;
+  z-index: 10;
 
   .sidebar-logo {
     display: flex;
@@ -330,15 +335,22 @@ export default {
     margin-bottom: 30px;
     
     .logo-icon {
-      font-size: 24px;
-      color: #4080ff;
+      font-size: 28px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
     .logo-text {
       margin-left: 10px;
-      font-size: 18px;
-      font-weight: 600;
-      color: #333;
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
     }
   }
 
@@ -351,18 +363,28 @@ export default {
       padding: 12px 20px;
       color: #5c6572;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       font-size: 14px;
       text-decoration: none;
+      border-radius: 8px;
+      margin: 0 12px 4px;
+      font-weight: 500;
 
-      &:hover, &.active {
-        background-color: #f2f5fa;
-        color: #4080ff;
+      &:hover {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        color: #667eea;
+        transform: translateX(4px);
+      }
+
+      &.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
       }
 
       :deep(i) {
         font-size: 16px;
-        margin-right: 8px;
+        margin-right: 10px;
       }
     }
   }
@@ -374,14 +396,16 @@ export default {
     .login-button {
       display: flex;
       align-items: center;
+      justify-content: center;
       padding: 12px 16px;
-      background: #4080ff;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 
       :deep(svg) {
         width: 16px;
@@ -390,8 +414,8 @@ export default {
       }
 
       &:hover {
-        background: #3070ef;
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
       }
     }
 
@@ -572,58 +596,66 @@ export default {
   padding: 40px;
   padding-bottom: 60px; /* 为页脚留出空间 */
   overflow-y: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .welcome-section {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 64px;
   animation: fadeIn 0.8s ease-in;
   
   .welcome-icon {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    background: #4080ff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    margin-bottom: 24px;
-    box-shadow: 0 10px 30px rgba(64, 128, 255, 0.2);
+    margin-bottom: 28px;
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+    animation: float 3s ease-in-out infinite;
     
     :deep(svg) {
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
     }
   }
   
   h1 {
-    font-size: 32px;
-    font-weight: 700;
+    font-size: 38px;
+    font-weight: 800;
     margin-bottom: 16px;
-    color: #333;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
   }
   
   p {
-    font-size: 16px;
-    color: #666;
+    font-size: 18px;
+    color: #5a6c7d;
     max-width: 600px;
     margin: 0 auto;
     line-height: 1.6;
+    font-weight: 500;
   }
 }
 
 .apps-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  max-width: 1000px;
+  margin: 0 auto 48px;
   animation: slideUp 0.6s ease-out;
   animation-fill-mode: both;
-  margin-bottom: 48px;
   
   .app-item {
-    animation: fadeIn 0.4s ease-in;
+    animation: scaleIn 0.5s ease-out;
     animation-fill-mode: both;
     
     &:nth-child(1) {
@@ -641,74 +673,106 @@ export default {
     &:nth-child(4) {
       animation-delay: 0.4s;
     }
-
-    &:nth-child(5) {
-      animation-delay: 0.5s;
-    }
   }
 }
 
 .fitness-overview {
   margin-bottom: 48px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
 
   h2 {
-    font-size: 24px;
-    font-weight: 600;
-    color: #333;
-    margin: 0 0 24px 0;
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 32px 0;
     text-align: center;
+    letter-spacing: -0.5px;
   }
 
   .overview-cards {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
 
     .overview-card {
       background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.08) 0%, transparent 70%);
+        transform: translate(30%, -30%);
+        pointer-events: none;
+      }
 
       &:hover {
-        transform: translateY(-4px);
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+        .card-icon {
+          transform: scale(1.1) rotate(-5deg);
+        }
       }
 
       .card-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        background: linear-gradient(45deg, #4080ff, #40a9ff);
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        transition: all 0.4s ease;
 
         :deep(svg) {
-          width: 20px;
-          height: 20px;
+          width: 24px;
+          height: 24px;
           color: white;
         }
       }
 
       .card-content {
+        position: relative;
+        z-index: 1;
+
         h3 {
-          margin: 0 0 8px 0;
-          font-size: 14px;
-          color: #666;
-          font-weight: 500;
+          margin: 0 0 10px 0;
+          font-size: 15px;
+          color: #5a6c7d;
+          font-weight: 600;
+          letter-spacing: 0.3px;
         }
 
         .value {
-          font-size: 24px;
-          font-weight: 700;
-          color: #333;
+          font-size: 32px;
+          font-weight: 800;
+          color: #1a202c;
+          letter-spacing: -1px;
 
           span {
-            font-size: 14px;
-            color: #666;
-            font-weight: 400;
+            font-size: 16px;
+            color: #667eea;
+            font-weight: 600;
+            margin-left: 4px;
           }
         }
       }
@@ -732,10 +796,31 @@ export default {
   }
 }
 
+@keyframes scaleIn {
+  from { 
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 // 响应式设计
 @media (max-width: 1200px) {
   .apps-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
   }
 
   .fitness-overview .overview-cards {
