@@ -76,26 +76,54 @@
       </div>
     </div>
 
-    <!-- 记录身体数据弹窗 -->
-    <a-modal v-model:visible="showDataModal" title="记录身体数据" @ok="saveBodyData">
+    <!-- 添加健身数据弹窗 -->
+    <a-modal v-model:visible="showDataModal" title="添加健身数据" @ok="saveBodyData">
       <a-form :model="bodyDataForm" layout="vertical">
-        <a-form-item label="体重 (kg)">
+        <a-form-item label="性别" required>
+          <a-radio-group v-model="bodyDataForm.gender" @change="calculateBodyFatPercentage">
+            <a-radio value="男">男</a-radio>
+            <a-radio value="女">女</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item label="年龄" required>
+          <a-input-number
+            v-model="bodyDataForm.age"
+            placeholder="输入年龄"
+            :min="1"
+            :max="150"
+            @change="calculateBodyFatPercentage"
+          />
+        </a-form-item>
+        <a-form-item label="身高(cm)" required>
+          <a-input-number
+            v-model="bodyDataForm.height"
+            placeholder="输入身高"
+            :precision="1"
+            :min="100"
+            :max="250"
+            @change="calculateBodyFatPercentage"
+          />
+        </a-form-item>
+        <a-form-item label="体重(kg)" required>
           <a-input-number
             v-model="bodyDataForm.weight"
             placeholder="输入体重"
             :precision="1"
-            @change="calculateBMIRealtime"
+            :min="1"
+            @change="calculateBodyFatPercentage"
           />
         </a-form-item>
-        <a-form-item label="体脂率 (%)">
-          <a-input-number v-model="bodyDataForm.bodyFat" placeholder="输入体脂率" :precision="1" />
-        </a-form-item>
-        <a-form-item label="身高 (cm)">
-          <a-input-number
-            v-model="bodyDataForm.height"
-            placeholder="输入身高"
-            @change="calculateBMIRealtime"
+        <a-form-item label="体脂率(%)">
+          <a-input-number 
+            v-model="bodyDataForm.bodyFat" 
+            placeholder="自动计算" 
+            :precision="1" 
+            :min="1" 
+            :max="50"
+            disabled
+            readonly
           />
+          <div class="helper-text">根据性别、年龄、身高、体重自动计算</div>
         </a-form-item>
 
         <!-- BMI计算结果显示区域 -->
@@ -121,11 +149,8 @@
           </div>
         </a-form-item>
 
-        <a-form-item label="记录日期">
-          <a-date-picker v-model="bodyDataForm.recordDate" style="width: 100%" />
-        </a-form-item>
-        <a-form-item label="备注">
-          <a-textarea v-model="bodyDataForm.notes" placeholder="添加备注信息" />
+        <a-form-item label="记录日期" required>
+          <a-date-picker v-model="bodyDataForm.dateRecorded" style="width: 100%" value-format="YYYY-MM-DD" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -244,11 +269,12 @@ export default {
     
     // 表单数据
     const bodyDataForm = reactive({
+      gender: '',
+      age: null,
+      height: null,
       weight: null,
       bodyFat: null,
-      height: null,
-      recordDate: new Date(),
-      notes: ''
+      dateRecorded: new Date().toISOString().split('T')[0]
     });
 
     // BMI计算相关数据
@@ -317,6 +343,53 @@ export default {
       }
     };
 
+    // 计算体脂率
+    const calculateBodyFatPercentage = () => {
+      // 检查是否所有必要数据都已输入
+      if (!bodyDataForm.gender || !bodyDataForm.age || !bodyDataForm.height || !bodyDataForm.weight) {
+        bodyDataForm.bodyFat = null;
+        return;
+      }
+
+      // 计算BMI
+      const heightInMeters = bodyDataForm.height / 100;
+      const bmi = bodyDataForm.weight / (heightInMeters * heightInMeters);
+
+      let bodyFatPercentage = 0;
+
+      // 判断是否为未成年（周岁年龄小于18岁）
+      const isMinor = bodyDataForm.age < 18;
+
+      if (isMinor) {
+        // 未成年计算公式
+        if (bodyDataForm.gender === '男') {
+          // 未成年男性：体脂率（BFP） = 1.51 × BMI - 0.70 × 年龄 - 2.2
+          bodyFatPercentage = 1.51 * bmi - 0.70 * bodyDataForm.age - 2.2;
+        } else {
+          // 未成年女性：体脂率（BFP） = 1.51 × BMI - 0.70 × 年龄 + 1.4
+          bodyFatPercentage = 1.51 * bmi - 0.70 * bodyDataForm.age + 1.4;
+        }
+      } else {
+        // 成年计算公式
+        if (bodyDataForm.gender === '男') {
+          // 成年男性：体脂率（BFP） = 1.20 × BMI + 0.23 × 年龄 - 16.2
+          bodyFatPercentage = 1.20 * bmi + 0.23 * bodyDataForm.age - 16.2;
+        } else {
+          // 成年女性：体脂率（BFP） = 1.20 × BMI + 0.23 × 年龄 - 5.4
+          bodyFatPercentage = 1.20 * bmi + 0.23 * bodyDataForm.age - 5.4;
+        }
+      }
+
+      // 确保体脂率在合理范围内（1%-50%）
+      bodyFatPercentage = Math.max(1, Math.min(50, bodyFatPercentage));
+
+      // 保留一位小数
+      bodyDataForm.bodyFat = parseFloat(bodyFatPercentage.toFixed(1));
+
+      // 同时触发BMI计算
+      calculateBMIRealtime();
+    };
+
     const calculateBMI = () => {
       // 保留原有的简单BMI计算用于显示最新BMI
       if (latestBodyData.value.weight && latestBodyData.value.height) {
@@ -326,21 +399,65 @@ export default {
       return null;
     };
 
-    const saveBodyData = () => {
-      // 这里应该调用API保存身体数据
-      latestBodyData.value = { ...bodyDataForm };
-      showDataModal.value = false;
-      
-      // 重置表单
-      Object.keys(bodyDataForm).forEach(key => {
-        if (key === 'recordDate') {
-          bodyDataForm[key] = new Date();
-        } else if (typeof bodyDataForm[key] === 'number') {
-          bodyDataForm[key] = null;
-        } else {
-          bodyDataForm[key] = '';
+    const saveBodyData = async () => {
+      try {
+        // 验证必填字段
+        if (!bodyDataForm.gender) {
+          Message.warning('请选择性别');
+          return;
         }
-      });
+        if (!bodyDataForm.age) {
+          Message.warning('请输入年龄');
+          return;
+        }
+        if (!bodyDataForm.height) {
+          Message.warning('请输入身高');
+          return;
+        }
+        if (!bodyDataForm.weight) {
+          Message.warning('请输入体重');
+          return;
+        }
+        if (!bodyDataForm.bodyFat) {
+          Message.warning('体脂率未计算，请确保所有数据填写完整');
+          return;
+        }
+
+        const fitnessData = {
+          weight: bodyDataForm.weight,
+          bodyFat: bodyDataForm.bodyFat,
+          height: bodyDataForm.height,
+          dateRecorded: bodyDataForm.dateRecorded
+        };
+
+        const response = await ApiService.addFitnessData(fitnessData);
+        if (response.code === 0) {
+          Message.success('健身数据添加成功');
+          showDataModal.value = false;
+
+          // 重置表单
+          Object.keys(bodyDataForm).forEach(key => {
+            if (key === 'dateRecorded') {
+              bodyDataForm[key] = new Date().toISOString().split('T')[0];
+            } else if (key === 'gender') {
+              bodyDataForm[key] = '';
+            } else {
+              bodyDataForm[key] = null;
+            }
+          });
+
+          // 重新加载数据和图表
+          await loadFitnessData();
+          await nextTick();
+          await initWeightChart();
+          await initBodyFatChart();
+        } else {
+          Message.error(response.message || '添加健身数据失败');
+        }
+      } catch (error) {
+        console.error('保存健身数据失败:', error);
+        Message.error('保存健身数据失败');
+      }
     };
 
 
@@ -1348,5 +1465,13 @@ export default {
       }
     }
   }
+}
+
+// 辅助文本样式
+.helper-text {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #86909c;
+  line-height: 1.5;
 }
 </style>
