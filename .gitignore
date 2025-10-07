@@ -18,6 +18,25 @@ pnpm-debug.log*
 .vscode
 *.suo
 *.ntvs*
-*.njsproj
+*.njsproj*
 *.sln
 *.sw?
+
+# Documentation and scripts
+scripts/
+CSS_VARIABLES_THEME_GUIDE.md
+DARK_MODE_FINAL_OPTIMIZATION.md
+DARK_MODE_FINAL_SOLUTION.md
+DARK_MODE_OPTIMIZATION.md
+default_OpenAPI.json
+FITNESS_KNOWLEDGE_OPTIMIZATION.md
+FITNESS_QUICK_REFERENCE.md
+IMAGE_OPTIMIZATION_GUIDE.md
+IMAGE_SOLUTION_SUMMARY.md
+PINIA_FIX.md
+QUICK_FIX_GUIDE.md
+TEXT_VISIBILITY_FIX.md
+THEME_FEATURE.md
+体脂率显示问题解决方案.md
+体脂率自动计算功能说明.md
+运动卡路里自动计算功能说明.md
