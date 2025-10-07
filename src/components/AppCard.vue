@@ -235,94 +235,199 @@ export default {
 // 暗黑模式样式
 :global(.dark-theme) {
   .app-card {
-    // 使用更具层次感的背景渐变
-    background: linear-gradient(135deg, rgba(40, 42, 54, 0.95) 0%, rgba(32, 34, 45, 0.95) 100%) !important;
-    border: 2px solid rgba(141, 154, 255, 0.35);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6),
-                0 0 0 1px rgba(141, 154, 255, 0.15) inset,
-                0 2px 16px rgba(141, 154, 255, 0.2);
-    backdrop-filter: blur(12px);
+    // 使用更亮的背景渐变，提升对比度
+    background: linear-gradient(135deg, rgba(48, 52, 68, 0.98) 0%, rgba(40, 44, 58, 0.98) 100%) !important;
+    border: 3px solid rgba(141, 154, 255, 0.5);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7),
+                0 0 0 1px rgba(141, 154, 255, 0.25) inset,
+                0 4px 24px rgba(141, 154, 255, 0.3),
+                0 0 80px rgba(141, 154, 255, 0.15);
+    backdrop-filter: blur(16px);
+    position: relative;
+    
+    // 添加顶部光晕效果
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(141, 154, 255, 0.6) 20%, 
+        rgba(141, 154, 255, 0.8) 50%, 
+        rgba(141, 154, 255, 0.6) 80%, 
+        transparent
+      );
+      opacity: 0.8;
+    }
     
     &:hover {
-      border-color: rgba(141, 154, 255, 0.6);
-      box-shadow: 0 16px 48px rgba(141, 154, 255, 0.35),
-                  0 0 60px rgba(141, 154, 255, 0.25),
-                  0 0 0 2px rgba(141, 154, 255, 0.3) inset;
-      background: linear-gradient(135deg, rgba(45, 47, 60, 0.98) 0%, rgba(37, 39, 51, 0.98) 100%) !important;
+      border-color: rgba(141, 154, 255, 0.7);
+      box-shadow: 0 20px 60px rgba(141, 154, 255, 0.45),
+                  0 0 100px rgba(141, 154, 255, 0.35),
+                  0 0 150px rgba(141, 154, 255, 0.2),
+                  0 0 0 3px rgba(141, 154, 255, 0.5) inset;
+      background: linear-gradient(135deg, rgba(55, 60, 78, 1) 0%, rgba(47, 51, 67, 1) 100%) !important;
+      
+      &::after {
+        opacity: 1;
+        box-shadow: 0 0 20px rgba(141, 154, 255, 0.6);
+      }
     }
     
     .app-title {
-      // 纯白色标题，增强发光效果
+      // 超亮白色标题，增强发光效果
       color: #ffffff !important;
-      text-shadow: 0 2px 12px rgba(141, 154, 255, 0.6),
-                   0 0 30px rgba(141, 154, 255, 0.4);
-      font-weight: 800;
+      text-shadow: 0 3px 16px rgba(141, 154, 255, 0.8),
+                   0 0 40px rgba(141, 154, 255, 0.5),
+                   0 0 60px rgba(141, 154, 255, 0.3);
+      font-weight: 900;
       letter-spacing: -0.5px;
+      filter: brightness(1.15);
+      font-size: 24px;
     }
     
     .app-desc {
-      // 亮灰色描述，增强可读性
-      color: #d8d8d8 !important;
-      font-weight: 500;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      // 超亮灰色描述，显著增强可读性
+      color: #e8e8e8 !important;
+      font-weight: 600;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4),
+                   0 0 20px rgba(141, 154, 255, 0.15);
+      font-size: 16px;
+      line-height: 1.7;
     }
     
     .arrow-icon {
-      background: linear-gradient(135deg, rgba(141, 154, 255, 0.25) 0%, rgba(157, 125, 197, 0.2) 100%);
-      box-shadow: 0 2px 8px rgba(141, 154, 255, 0.2);
+      background: linear-gradient(135deg, rgba(141, 154, 255, 0.35) 0%, rgba(157, 125, 197, 0.3) 100%);
+      box-shadow: 0 3px 12px rgba(141, 154, 255, 0.3),
+                  0 0 20px rgba(141, 154, 255, 0.2);
       
       &::before {
-        color: #a5b4ff;
-        text-shadow: 0 0 8px rgba(141, 154, 255, 0.5);
+        color: #b4c0ff;
+        font-weight: 700;
+        text-shadow: 0 0 12px rgba(141, 154, 255, 0.7),
+                     0 0 24px rgba(141, 154, 255, 0.4);
       }
     }
     
-    // 增强图标的发光效果
+    // 显著增强图标的发光效果和立体感
     .app-icon {
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4),
-                  0 0 30px rgba(141, 154, 255, 0.3),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+                  0 0 40px rgba(141, 154, 255, 0.4),
+                  0 0 60px rgba(141, 154, 255, 0.3),
+                  inset 0 2px 4px rgba(255, 255, 255, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      transform: scale(1.02);
+      
+      i {
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+      }
     }
     
-    // 不同主题卡片的背景微调 - 增强一些
+    // 不同主题卡片的背景微调 - 显著增强
     &.card-theme-orange {
+      border-color: rgba(255, 147, 251, 0.4);
+      
       &::before {
-        background: linear-gradient(135deg, rgba(255, 147, 251, 0.15) 0%, rgba(245, 87, 108, 0.1) 100%);
+        background: linear-gradient(135deg, rgba(255, 147, 251, 0.18) 0%, rgba(245, 87, 108, 0.12) 100%);
       }
       
-      &:hover::before {
-        opacity: 1.5;
+      &::after {
+        background: linear-gradient(90deg, 
+          transparent, 
+          rgba(255, 147, 251, 0.5) 20%, 
+          rgba(245, 87, 108, 0.6) 50%, 
+          rgba(255, 147, 251, 0.5) 80%, 
+          transparent
+        );
+      }
+      
+      &:hover {
+        border-color: rgba(255, 147, 251, 0.6);
+        
+        &::before {
+          opacity: 1.5;
+        }
       }
     }
     
     &.card-theme-blue {
+      border-color: rgba(79, 172, 254, 0.4);
+      
       &::before {
-        background: linear-gradient(135deg, rgba(79, 172, 254, 0.15) 0%, rgba(0, 242, 254, 0.1) 100%);
+        background: linear-gradient(135deg, rgba(79, 172, 254, 0.18) 0%, rgba(0, 242, 254, 0.12) 100%);
       }
       
-      &:hover::before {
-        opacity: 1.5;
+      &::after {
+        background: linear-gradient(90deg, 
+          transparent, 
+          rgba(79, 172, 254, 0.5) 20%, 
+          rgba(0, 242, 254, 0.6) 50%, 
+          rgba(79, 172, 254, 0.5) 80%, 
+          transparent
+        );
+      }
+      
+      &:hover {
+        border-color: rgba(79, 172, 254, 0.6);
+        
+        &::before {
+          opacity: 1.5;
+        }
       }
     }
     
     &.card-theme-green {
+      border-color: rgba(67, 233, 123, 0.4);
+      
       &::before {
-        background: linear-gradient(135deg, rgba(67, 233, 123, 0.15) 0%, rgba(56, 249, 215, 0.1) 100%);
+        background: linear-gradient(135deg, rgba(67, 233, 123, 0.18) 0%, rgba(56, 249, 215, 0.12) 100%);
       }
       
-      &:hover::before {
-        opacity: 1.5;
+      &::after {
+        background: linear-gradient(90deg, 
+          transparent, 
+          rgba(67, 233, 123, 0.5) 20%, 
+          rgba(56, 249, 215, 0.6) 50%, 
+          rgba(67, 233, 123, 0.5) 80%, 
+          transparent
+        );
+      }
+      
+      &:hover {
+        border-color: rgba(67, 233, 123, 0.6);
+        
+        &::before {
+          opacity: 1.5;
+        }
       }
     }
     
     &.card-theme-purple {
+      border-color: rgba(161, 140, 209, 0.4);
+      
       &::before {
-        background: linear-gradient(135deg, rgba(161, 140, 209, 0.15) 0%, rgba(251, 194, 235, 0.1) 100%);
+        background: linear-gradient(135deg, rgba(161, 140, 209, 0.18) 0%, rgba(251, 194, 235, 0.12) 100%);
       }
       
-      &:hover::before {
-        opacity: 1.5;
+      &::after {
+        background: linear-gradient(90deg, 
+          transparent, 
+          rgba(161, 140, 209, 0.5) 20%, 
+          rgba(251, 194, 235, 0.6) 50%, 
+          rgba(161, 140, 209, 0.5) 80%, 
+          transparent
+        );
+      }
+      
+      &:hover {
+        border-color: rgba(161, 140, 209, 0.6);
+        
+        &::before {
+          opacity: 1.5;
+        }
       }
     }
   }

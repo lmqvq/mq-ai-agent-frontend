@@ -776,81 +776,96 @@ export default {
     .welcome-section {
       h1 {
         color: #ffffff !important;
-        text-shadow: 0 2px 16px rgba(141, 154, 255, 0.7),
-                     0 0 30px rgba(141, 154, 255, 0.4);
-        font-weight: 800;
+        text-shadow: 0 3px 20px rgba(141, 154, 255, 0.9),
+                     0 0 50px rgba(141, 154, 255, 0.6),
+                     0 0 100px rgba(141, 154, 255, 0.3);
+        font-weight: 900;
         letter-spacing: -1px;
+        filter: brightness(1.2);
       }
       
       p {
-        color: #d8d8d8 !important;
+        color: #e8e8e8 !important;
         font-weight: 500;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        text-shadow: 0 2px 8px rgba(141, 154, 255, 0.4),
+                     0 0 20px rgba(141, 154, 255, 0.2);
+        font-size: 19px;
       }
       
       .welcome-icon {
-        background: linear-gradient(135deg, #7d8cff 0%, #9d7dc5 100%);
-        box-shadow: 0 15px 50px rgba(141, 109, 178, 0.6),
-                    0 0 60px rgba(141, 154, 255, 0.3),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        border: 2px solid rgba(141, 154, 255, 0.3);
+        background: linear-gradient(135deg, #8d9aff 0%, #a58dd0 100%);
+        box-shadow: 0 20px 60px rgba(141, 109, 178, 0.8),
+                    0 0 80px rgba(141, 154, 255, 0.5),
+                    0 0 120px rgba(141, 154, 255, 0.3),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        border: 3px solid rgba(141, 154, 255, 0.5);
+        transform: scale(1.05);
       }
     }
     
     .fitness-overview {
       h2 {
         color: #ffffff !important;
-        text-shadow: 0 2px 16px rgba(141, 154, 255, 0.7),
-                     0 0 30px rgba(141, 154, 255, 0.4);
-        font-weight: 800;
+        text-shadow: 0 3px 20px rgba(141, 154, 255, 0.9),
+                     0 0 50px rgba(141, 154, 255, 0.6),
+                     0 0 100px rgba(141, 154, 255, 0.3);
+        font-weight: 900;
         letter-spacing: -1px;
+        filter: brightness(1.2);
       }
       
       .overview-card {
-        background: linear-gradient(135deg, rgba(40, 42, 54, 0.95) 0%, rgba(32, 34, 45, 0.95) 100%);
-        border: 2px solid rgba(141, 154, 255, 0.4);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 
-                    0 0 0 1px rgba(141, 154, 255, 0.15) inset,
-                    0 2px 12px rgba(141, 154, 255, 0.2);
-        backdrop-filter: blur(12px);
+        background: linear-gradient(135deg, rgba(45, 48, 62, 0.98) 0%, rgba(38, 40, 52, 0.98) 100%);
+        border: 2px solid rgba(141, 154, 255, 0.5);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 
+                    0 0 0 1px rgba(141, 154, 255, 0.2) inset,
+                    0 4px 20px rgba(141, 154, 255, 0.3),
+                    0 0 60px rgba(141, 154, 255, 0.15);
+        backdrop-filter: blur(16px);
         
         &::before {
           background: radial-gradient(circle at top right, rgba(141, 154, 255, 0.18) 0%, transparent 70%);
         }
         
         &:hover {
-          box-shadow: 0 16px 48px rgba(141, 154, 255, 0.35), 
-                      0 0 60px rgba(141, 154, 255, 0.25),
-                      0 0 0 2px rgba(141, 154, 255, 0.4) inset;
-          border-color: rgba(141, 154, 255, 0.7);
-          transform: translateY(-8px) scale(1.03);
-          background: linear-gradient(135deg, rgba(45, 47, 60, 0.98) 0%, rgba(37, 39, 51, 0.98) 100%);
+          box-shadow: 0 20px 60px rgba(141, 154, 255, 0.45), 
+                      0 0 80px rgba(141, 154, 255, 0.35),
+                      0 0 120px rgba(141, 154, 255, 0.2),
+                      0 0 0 3px rgba(141, 154, 255, 0.5) inset;
+          border-color: rgba(141, 154, 255, 0.8);
+          transform: translateY(-8px) scale(1.04);
+          background: linear-gradient(135deg, rgba(50, 53, 68, 1) 0%, rgba(42, 44, 58, 1) 100%);
         }
         
         .card-icon {
-          background: linear-gradient(135deg, #8d9aff 0%, #9d7dc5 100%);
-          box-shadow: 0 6px 24px rgba(141, 109, 178, 0.7), 
-                      0 0 40px rgba(141, 109, 178, 0.4),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: linear-gradient(135deg, #9da8ff 0%, #a58dd0 100%);
+          box-shadow: 0 8px 32px rgba(141, 109, 178, 0.9), 
+                      0 0 50px rgba(141, 109, 178, 0.6),
+                      0 0 80px rgba(141, 154, 255, 0.4),
+                      inset 0 2px 4px rgba(255, 255, 255, 0.3);
+          border: 2px solid rgba(255, 255, 255, 0.2);
         }
         
         .card-content {
           h3 {
-            color: #d8d8d8;
-            font-weight: 600;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            color: #e8e8e8;
+            font-weight: 700;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            font-size: 16px;
           }
           
           .value {
             color: #ffffff;
-            font-weight: 800;
-            text-shadow: 0 2px 8px rgba(141, 154, 255, 0.4);
+            font-weight: 900;
+            text-shadow: 0 3px 12px rgba(141, 154, 255, 0.6),
+                         0 0 30px rgba(141, 154, 255, 0.3);
+            filter: brightness(1.1);
             
             span {
-              color: #a5b4ff;
-              font-weight: 600;
-              text-shadow: 0 1px 4px rgba(141, 154, 255, 0.3);
+              color: #b4c0ff;
+              font-weight: 700;
+              text-shadow: 0 2px 8px rgba(141, 154, 255, 0.5),
+                           0 0 20px rgba(141, 154, 255, 0.3);
             }
           }
         }
@@ -1236,12 +1251,13 @@ export default {
     }
     
     .sidebar-menu .menu-item {
-      color: #c0c0c0;
+      color: #d0d0d0;
+      font-weight: 500;
       
       &:hover {
-        background: linear-gradient(135deg, rgba(141, 154, 255, 0.2) 0%, rgba(157, 125, 197, 0.18) 100%);
-        color: #a5b4ff;
-        box-shadow: 0 2px 8px rgba(141, 154, 255, 0.15);
+        background: linear-gradient(135deg, rgba(141, 154, 255, 0.25) 0%, rgba(157, 125, 197, 0.2) 100%);
+        color: #b4c0ff;
+        box-shadow: 0 3px 12px rgba(141, 154, 255, 0.2);
       }
       
       &.active {
