@@ -81,7 +81,15 @@
     </div>
 
     <!-- 主内容区 -->
-    <div class="main-content">
+    <div class="main-content" :class="{ 'dark-mode': themeStore.theme === 'dark' }">
+      <!-- 主题切换按钮 -->
+      <div class="theme-toggle" @click="themeStore.toggleTheme()">
+        <transition name="icon-fade" mode="out-in">
+          <icon-moon v-if="themeStore.theme === 'light'" key="moon" />
+          <icon-sun v-else key="sun" />
+        </transition>
+      </div>
+      
       <div class="welcome-section">
         <div class="welcome-icon">
           <icon-robot />
@@ -154,10 +162,12 @@ import { useRouter } from 'vue-router';
 import AppCard from '@/components/AppCard.vue';
 import {
   IconHome, IconUser, IconBarChart, IconTrophy,
-  IconFire, IconClockCircle, IconHeart, IconBook, IconEdit, IconPoweroff, IconRobot
+  IconFire, IconClockCircle, IconHeart, IconBook, IconEdit, IconPoweroff, IconRobot,
+  IconMoon, IconSun
 } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
 import { useUserStore } from '@/stores/user';
+import { useThemeStore } from '@/stores/theme';
 import ApiService from '@/services/api';
 
 export default {
@@ -174,11 +184,14 @@ export default {
     IconBook,
     IconEdit,
     IconPoweroff,
-    IconRobot
+    IconRobot,
+    IconMoon,
+    IconSun
   },
   setup() {
     const router = useRouter();
     const userStore = useUserStore();
+    const themeStore = useThemeStore();
     const showUserMenu = ref(false);
     const userInfoRef = ref(null);
 
@@ -419,6 +432,7 @@ export default {
       isLoggedIn: userStore.isLoggedIn,
       userInfo: userStore.userInfo,
       workoutStats,
+      themeStore,
       goToLogin,
       toggleUserMenu,
       goToProfile,
@@ -434,8 +448,9 @@ export default {
   display: flex;
   height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: #ffffff;
   position: relative;
+  transition: background-color 0.3s ease;
   
   &::before {
     content: '';
@@ -444,8 +459,8 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 20% 50%, rgba(64, 128, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(64, 169, 255, 0.08) 0%, transparent 50%);
+    background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.03) 0%, transparent 50%);
     pointer-events: none;
   }
 }
@@ -733,6 +748,115 @@ export default {
   overflow-y: auto;
   position: relative;
   z-index: 1;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  
+  // 暗黑模式样式
+  &.dark-mode {
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+    color: #e8e8e8;
+    
+    // 增加一个微妙的网格纹理背景
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(141, 154, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(157, 125, 197, 0.06) 0%, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    
+    .welcome-section {
+      h1 {
+        color: #ffffff !important;
+        text-shadow: 0 2px 16px rgba(141, 154, 255, 0.7),
+                     0 0 30px rgba(141, 154, 255, 0.4);
+        font-weight: 800;
+        letter-spacing: -1px;
+      }
+      
+      p {
+        color: #d8d8d8 !important;
+        font-weight: 500;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      }
+      
+      .welcome-icon {
+        background: linear-gradient(135deg, #7d8cff 0%, #9d7dc5 100%);
+        box-shadow: 0 15px 50px rgba(141, 109, 178, 0.6),
+                    0 0 60px rgba(141, 154, 255, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(141, 154, 255, 0.3);
+      }
+    }
+    
+    .fitness-overview {
+      h2 {
+        color: #ffffff !important;
+        text-shadow: 0 2px 16px rgba(141, 154, 255, 0.7),
+                     0 0 30px rgba(141, 154, 255, 0.4);
+        font-weight: 800;
+        letter-spacing: -1px;
+      }
+      
+      .overview-card {
+        background: linear-gradient(135deg, rgba(40, 42, 54, 0.95) 0%, rgba(32, 34, 45, 0.95) 100%);
+        border: 2px solid rgba(141, 154, 255, 0.4);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 
+                    0 0 0 1px rgba(141, 154, 255, 0.15) inset,
+                    0 2px 12px rgba(141, 154, 255, 0.2);
+        backdrop-filter: blur(12px);
+        
+        &::before {
+          background: radial-gradient(circle at top right, rgba(141, 154, 255, 0.18) 0%, transparent 70%);
+        }
+        
+        &:hover {
+          box-shadow: 0 16px 48px rgba(141, 154, 255, 0.35), 
+                      0 0 60px rgba(141, 154, 255, 0.25),
+                      0 0 0 2px rgba(141, 154, 255, 0.4) inset;
+          border-color: rgba(141, 154, 255, 0.7);
+          transform: translateY(-8px) scale(1.03);
+          background: linear-gradient(135deg, rgba(45, 47, 60, 0.98) 0%, rgba(37, 39, 51, 0.98) 100%);
+        }
+        
+        .card-icon {
+          background: linear-gradient(135deg, #8d9aff 0%, #9d7dc5 100%);
+          box-shadow: 0 6px 24px rgba(141, 109, 178, 0.7), 
+                      0 0 40px rgba(141, 109, 178, 0.4),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-content {
+          h3 {
+            color: #d8d8d8;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+          }
+          
+          .value {
+            color: #ffffff;
+            font-weight: 800;
+            text-shadow: 0 2px 8px rgba(141, 154, 255, 0.4);
+            
+            span {
+              color: #a5b4ff;
+              font-weight: 600;
+              text-shadow: 0 1px 4px rgba(141, 154, 255, 0.3);
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 .welcome-section {
@@ -996,4 +1120,227 @@ export default {
     }
   }
 }
-</style> 
+
+// 主题切换按钮样式
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 100;
+  border: 2px solid #f0f0f0;
+  
+  :deep(svg) {
+    width: 24px;
+    height: 24px;
+    color: #667eea;
+    transition: all 0.3s ease;
+  }
+  
+  &:hover {
+    transform: scale(1.1) rotate(15deg);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: transparent;
+    
+    :deep(svg) {
+      color: white;
+      transform: rotate(-15deg);
+    }
+  }
+  
+  // 暗黑模式下的样式
+  .dark-mode & {
+    background: linear-gradient(135deg, rgba(40, 42, 54, 0.95) 0%, rgba(32, 34, 45, 0.95) 100%);
+    border: 2px solid rgba(141, 154, 255, 0.3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(141, 154, 255, 0.15) inset;
+    backdrop-filter: blur(12px);
+    
+    :deep(svg) {
+      color: #ffd700;
+      filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.5));
+    }
+    
+    &:hover {
+      background: linear-gradient(135deg, #8d9aff 0%, #9d7dc5 100%);
+      box-shadow: 0 8px 28px rgba(141, 109, 178, 0.5),
+                  0 0 40px rgba(141, 154, 255, 0.3),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.2);
+      
+      :deep(svg) {
+        color: white;
+        filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.4));
+      }
+    }
+  }
+}
+
+// 图标切换动画
+.icon-fade-enter-active,
+.icon-fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.icon-fade-enter-from {
+  opacity: 0;
+  transform: rotate(180deg) scale(0.5);
+}
+
+.icon-fade-leave-to {
+  opacity: 0;
+  transform: rotate(-180deg) scale(0.5);
+}
+
+// 全局暗黑模式样式
+:global(.dark-theme) {
+  .home-container {
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+    
+    &::before {
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(141, 154, 255, 0.10) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(157, 125, 197, 0.08) 0%, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 60px 60px, 60px 60px;
+    }
+  }
+  
+  .sidebar {
+    background: linear-gradient(180deg, rgba(25, 25, 35, 0.98) 0%, rgba(20, 20, 30, 0.98) 100%);
+    border-right: 1px solid rgba(141, 154, 255, 0.2);
+    box-shadow: 4px 0 32px rgba(0, 0, 0, 0.5), 
+                inset -1px 0 0 rgba(141, 154, 255, 0.1);
+    backdrop-filter: blur(12px);
+    
+    .sidebar-logo {
+      .logo-icon,
+      .logo-text {
+        background: linear-gradient(135deg, #9da8ff 0%, #b69dd6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 2px 8px rgba(141, 154, 255, 0.5));
+      }
+    }
+    
+    .sidebar-menu .menu-item {
+      color: #c0c0c0;
+      
+      &:hover {
+        background: linear-gradient(135deg, rgba(141, 154, 255, 0.2) 0%, rgba(157, 125, 197, 0.18) 100%);
+        color: #a5b4ff;
+        box-shadow: 0 2px 8px rgba(141, 154, 255, 0.15);
+      }
+      
+      &.active {
+        background: linear-gradient(135deg, #8d9aff 0%, #9d7dc5 100%);
+        color: white;
+        box-shadow: 0 4px 16px rgba(141, 109, 178, 0.5),
+                    0 0 20px rgba(141, 154, 255, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    }
+    
+    .user-area {
+      border-top-color: #3a3a3a;
+      
+      .login-button {
+        background: linear-gradient(135deg, #8d9aff 0%, #9d7dc5 100%);
+        box-shadow: 0 4px 16px rgba(141, 109, 178, 0.5),
+                    0 0 24px rgba(141, 154, 255, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        
+        &:hover {
+          box-shadow: 0 6px 20px rgba(141, 109, 178, 0.6),
+                      0 0 32px rgba(141, 154, 255, 0.4);
+        }
+      }
+      
+      .user-info {
+        &:hover {
+          background: linear-gradient(135deg, rgba(141, 154, 255, 0.12) 0%, rgba(157, 125, 197, 0.1) 100%);
+          box-shadow: 0 2px 8px rgba(141, 154, 255, 0.15);
+        }
+        
+        .user-details {
+          .user-name {
+            color: #f0f0f0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+          }
+          
+          .user-role {
+            color: #c0c0c0;
+          }
+        }
+        
+        .user-menu {
+          background: linear-gradient(180deg, rgba(35, 35, 45, 0.98) 0%, rgba(30, 30, 40, 0.98) 100%);
+          border: 1px solid rgba(141, 154, 255, 0.25);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6),
+                      0 0 0 1px rgba(141, 154, 255, 0.15) inset;
+          backdrop-filter: blur(16px);
+          
+          .menu-header .menu-user-info {
+            .menu-user-name {
+              color: #f0f0f0;
+              text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            }
+            
+            .menu-user-role {
+              color: #c0c0c0;
+            }
+          }
+          
+          .menu-divider {
+            background: linear-gradient(90deg, transparent, rgba(141, 154, 255, 0.3), transparent);
+            height: 2px;
+          }
+          
+          .menu-items .menu-item {
+            color: #f0f0f0;
+            
+            :deep(svg) {
+              color: #c0c0c0;
+            }
+            
+            &:hover {
+              background: linear-gradient(135deg, rgba(141, 154, 255, 0.15) 0%, rgba(157, 125, 197, 0.12) 100%);
+              color: #a5b4ff;
+              box-shadow: 0 2px 8px rgba(141, 154, 255, 0.12);
+              
+              :deep(svg) {
+                color: #a5b4ff;
+              }
+            }
+            
+            &.logout {
+              color: #ff6b6b;
+              
+              :deep(svg) {
+                color: #ff6b6b;
+              }
+              
+              &:hover {
+                background-color: rgba(255, 107, 107, 0.1);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+</style>
