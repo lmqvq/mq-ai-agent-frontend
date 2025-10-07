@@ -202,21 +202,93 @@
     </div>
 
     <!-- 知识详情弹窗 -->
-    <a-modal v-model:visible="showKnowledgeModal" :title="selectedKnowledge?.title" width="800px">
+    <a-modal 
+      v-model:visible="showKnowledgeModal" 
+      :footer="false" 
+      width="900px"
+      :body-style="{ padding: 0 }"
+      modal-class="knowledge-modal"
+    >
+      <template #title>
+        <div class="modal-title-simple">
+          {{ selectedKnowledge?.title }}
+        </div>
+      </template>
       <div v-if="selectedKnowledge" class="knowledge-detail">
-        <img 
-          :src="selectedKnowledge.image" 
-          :alt="selectedKnowledge.title" 
-          class="detail-image" 
-          loading="lazy"
-        />
+        <div class="detail-image-wrapper">
+          <img 
+            :src="selectedKnowledge.image" 
+            :alt="selectedKnowledge.title" 
+            class="detail-image" 
+            loading="lazy"
+          />
+        </div>
         <div class="detail-content">
-          <p>{{ selectedKnowledge.content }}</p>
-          <div class="detail-tips">
-            <h4>重要提示</h4>
-            <ul>
-              <li v-for="tip in selectedKnowledge.tips" :key="tip">{{ tip }}</li>
+          <!-- 文章元数据 -->
+          <div class="article-meta">
+            <span class="difficulty-tag" :class="selectedKnowledge.difficulty">
+              {{ selectedKnowledge.difficulty }}
+            </span>
+            <span class="meta-item">
+              <icon-clock-circle /> {{ selectedKnowledge.readTime }} 分钟阅读
+            </span>
+            <span class="meta-item">
+              <icon-eye /> {{ selectedKnowledge.views }} 次浏览
+            </span>
+          </div>
+          <div class="content-section">
+            <h4 class="section-title">
+              <icon-book /> 核心内容
+            </h4>
+            <div class="content-text">
+              <p>{{ selectedKnowledge.content }}</p>
+            </div>
+          </div>
+          
+          <div class="content-section tips-section">
+            <h4 class="section-title">
+              <icon-fire /> 重要提示
+            </h4>
+            <ul class="tips-list">
+              <li v-for="(tip, index) in selectedKnowledge.tips" :key="tip" class="tip-item">
+                <span class="tip-number">{{ index + 1 }}</span>
+                <span class="tip-text">{{ tip }}</span>
+              </li>
             </ul>
+          </div>
+
+          <div class="detail-footer">
+            <div class="footer-stats">
+              <div class="stat-item">
+                <icon-eye class="stat-icon" />
+                <div class="stat-info">
+                  <div class="stat-value">{{ selectedKnowledge.views }}</div>
+                  <div class="stat-label">浏览量</div>
+                </div>
+              </div>
+              <div class="stat-item">
+                <icon-clock-circle class="stat-icon" />
+                <div class="stat-info">
+                  <div class="stat-value">{{ selectedKnowledge.readTime }}分钟</div>
+                  <div class="stat-label">阅读时间</div>
+                </div>
+              </div>
+              <div class="stat-item">
+                <icon-fire class="stat-icon" />
+                <div class="stat-info">
+                  <div class="stat-value">{{ selectedKnowledge.difficulty }}</div>
+                  <div class="stat-label">难度等级</div>
+                </div>
+              </div>
+            </div>
+            <div class="action-buttons">
+              <a-button type="outline" size="large" @click="shareKnowledge">
+                <icon-share-alt /> 分享文章
+              </a-button>
+              <a-button type="primary" size="large" @click="printKnowledge">
+                <icon-printer /> 打印保存
+              </a-button>
+            </div>
           </div>
         </div>
       </div>
@@ -252,14 +324,14 @@
 import { ref } from 'vue';
 import { 
   IconBook, IconTrophy, IconFire, IconHeart, IconUser, IconClockCircle, 
-  IconEye, IconPlayArrow 
+  IconEye, IconPlayArrow, IconShareAlt, IconPrinter
 } from '@arco-design/web-vue/es/icon';
 
 export default {
   name: 'FitnessKnowledge',
   components: {
     IconBook, IconTrophy, IconFire, IconHeart, IconUser, IconClockCircle, 
-    IconEye, IconPlayArrow
+    IconEye, IconPlayArrow, IconShareAlt, IconPrinter
   },
   setup() {
     const activeCategory = ref('basics');
@@ -1038,6 +1110,30 @@ export default {
       event.target.alt = '图片加载失败';
     };
 
+    // 分享文章
+    const shareKnowledge = () => {
+      if (selectedKnowledge.value) {
+        const text = `${selectedKnowledge.value.title} - ${selectedKnowledge.value.description}`;
+        if (navigator.share) {
+          navigator.share({
+            title: selectedKnowledge.value.title,
+            text: text,
+            url: window.location.href
+          });
+        } else {
+          // 复制到剪贴板
+          navigator.clipboard.writeText(text).then(() => {
+            console.log('已复制到剪贴板');
+          });
+        }
+      }
+    };
+
+    // 打印文章
+    const printKnowledge = () => {
+      window.print();
+    };
+
     return {
       activeCategory,
       showKnowledgeModal,
@@ -1054,7 +1150,9 @@ export default {
       playExerciseVideo,
       startProgram,
       viewProgramDetails,
-      handleImageError
+      handleImageError,
+      shareKnowledge,
+      printKnowledge
     };
   }
 };
@@ -1088,7 +1186,7 @@ img {
 
 .fitness-knowledge {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ffffff;
   padding: 20px;
   padding-bottom: 80px;
 }
@@ -1101,7 +1199,7 @@ img {
 .page-header {
   text-align: center;
   margin-bottom: 32px;
-  color: white;
+  color: #1a1a1a;
 
   h1 {
     font-size: 36px;
@@ -1127,11 +1225,9 @@ img {
     display: flex;
     justify-content: center;
     gap: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    background: #f5f5f5;
     padding: 8px;
     border-radius: 16px;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
 
     .nav-tab {
       display: flex;
@@ -1139,7 +1235,7 @@ img {
       gap: 8px;
       padding: 12px 24px;
       border-radius: 12px;
-      color: rgba(255, 255, 255, 0.7);
+      color: #666666;
       cursor: pointer;
       transition: all 0.3s ease;
       font-weight: 500;
@@ -1150,14 +1246,14 @@ img {
       }
 
       &:hover {
-        color: white;
-        background: rgba(255, 255, 255, 0.1);
+        color: #1a1a1a;
+        background: #e8e8e8;
       }
 
       &.active {
-        color: white;
-        background: rgba(255, 255, 255, 0.2);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        color: #ffffff;
+        background: #667eea;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
       }
     }
   }
@@ -1177,90 +1273,161 @@ img {
 }
 
 .knowledge-card {
-  border: 1px solid #f0f0f0;
-  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
   overflow: hidden;
-  transition: transform 0.3s ease;
+  background: white;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(102, 126, 234, 0.2);
+    border-color: #667eea;
+
+    &::before {
+      transform: scaleX(1);
+    }
+
+    .card-image img {
+      transform: scale(1.05);
+    }
   }
 
   .card-image {
     position: relative;
-    height: 200px;
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
+    height: 220px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform 0.3s ease;
     }
 
     .card-overlay {
       position: absolute;
-      top: 12px;
-      right: 12px;
+      top: 16px;
+      right: 16px;
 
       .difficulty-badge {
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 500;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
         color: white;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
         &.初级 {
-          background: rgba(0, 180, 42, 0.8);
+          background: linear-gradient(135deg, rgba(0, 180, 42, 0.95) 0%, rgba(0, 214, 143, 0.95) 100%);
         }
 
         &.中级 {
-          background: rgba(255, 125, 0, 0.8);
+          background: linear-gradient(135deg, rgba(255, 125, 0, 0.95) 0%, rgba(255, 169, 64, 0.95) 100%);
         }
 
         &.高级 {
-          background: rgba(245, 63, 63, 0.8);
+          background: linear-gradient(135deg, rgba(245, 63, 63, 0.95) 0%, rgba(255, 120, 117, 0.95) 100%);
         }
       }
     }
   }
 
   .card-content {
-    padding: 20px;
+    padding: 24px;
+    background: white;
 
     h3 {
-      margin: 0 0 8px 0;
-      font-size: 18px;
+      margin: 0 0 12px 0;
+      font-size: 20px;
       font-weight: 600;
-      color: #333;
+      color: #1a1a1a;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     p {
-      margin: 0 0 12px 0;
+      margin: 0 0 16px 0;
       color: #666;
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .card-meta {
       display: flex;
-      gap: 16px;
-      margin-bottom: 16px;
+      gap: 20px;
+      margin-bottom: 20px;
+      padding: 12px 0;
+      border-top: 1px solid #f0f0f0;
+      border-bottom: 1px solid #f0f0f0;
 
       span {
         display: flex;
         align-items: center;
-        gap: 4px;
-        font-size: 12px;
+        gap: 6px;
+        font-size: 13px;
         color: #999;
+        font-weight: 500;
 
         :deep(svg) {
-          width: 12px;
-          height: 12px;
+          width: 14px;
+          height: 14px;
+          color: #667eea;
+        }
+      }
+    }
+
+    .arco-btn {
+      width: 100%;
+      height: 42px;
+      font-size: 15px;
+      font-weight: 500;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      position: relative;
+
+      &::after {
+        content: '→';
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+
+        &::after {
+          transform: translateY(-50%) translateX(4px);
         }
       }
     }
@@ -1403,6 +1570,297 @@ img {
   }
 }
 
+// 知识详情弹窗样式
+// 修复 Modal 默认样式
+:deep(.knowledge-modal) {
+  .arco-modal-header {
+    padding: 24px 32px !important;
+    border-bottom: 1px solid #f0f0f0;
+  }
+}
+
+// 简化的标题样式
+.modal-title-simple {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.5;
+}
+
+.knowledge-detail {
+  .detail-image-wrapper {
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 100px;
+      background: linear-gradient(to top, rgba(255, 255, 255, 1), transparent);
+    }
+  }
+
+  .detail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .detail-content {
+    padding: 32px;
+    background: white;
+
+    // 文章元数据
+    .article-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, #f0f5ff 0%, #f9f0ff 100%);
+      border-radius: 12px;
+      border: 1px solid #e8e8ff;
+      margin-bottom: 32px;
+
+      .difficulty-tag {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        color: white;
+
+        &.初级 {
+          background: linear-gradient(135deg, #00b42a 0%, #00d68f 100%);
+        }
+
+        &.中级 {
+          background: linear-gradient(135deg, #ff7d00 0%, #ffa940 100%);
+        }
+
+        &.高级 {
+          background: linear-gradient(135deg, #f53f3f 0%, #ff7875 100%);
+        }
+      }
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #666;
+        font-size: 14px;
+        font-weight: 500;
+
+        :deep(svg) {
+          width: 16px;
+          height: 16px;
+          color: #667eea;
+        }
+      }
+    }
+
+    .content-section {
+      margin-bottom: 32px;
+
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 20px 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a1a1a;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f0f0f0;
+
+        :deep(svg) {
+          width: 20px;
+          height: 20px;
+          color: #667eea;
+        }
+      }
+
+      .content-text {
+        p {
+          margin: 0;
+          font-size: 16px;
+          line-height: 1.8;
+          color: #333;
+          text-align: justify;
+          text-indent: 2em;
+        }
+      }
+    }
+
+    .tips-section {
+      background: linear-gradient(135deg, #f0f5ff 0%, #f9f0ff 100%);
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid #e8e8ff;
+
+      .section-title {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 16px;
+      }
+
+      .tips-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        .tip-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          margin-bottom: 16px;
+          padding: 16px;
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+          transition: all 0.3s ease;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          &:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+          }
+
+          .tip-number {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 600;
+          }
+
+          .tip-text {
+            flex: 1;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+          }
+        }
+      }
+    }
+
+    .detail-footer {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #f0f0f0;
+
+      .footer-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+
+        .stat-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 16px;
+          background: linear-gradient(135deg, #f0f5ff 0%, #f9f0ff 100%);
+          border-radius: 12px;
+          border: 1px solid #e8e8ff;
+
+          .stat-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            color: white;
+            flex-shrink: 0;
+
+            :deep(svg) {
+              width: 20px;
+              height: 20px;
+            }
+          }
+
+          .stat-info {
+            flex: 1;
+
+            .stat-value {
+              font-size: 18px;
+              font-weight: 600;
+              color: #1a1a1a;
+              margin-bottom: 2px;
+            }
+
+            .stat-label {
+              font-size: 12px;
+              color: #666;
+            }
+          }
+        }
+      }
+
+      .action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+
+        .arco-btn {
+          height: 48px;
+          font-size: 15px;
+          font-weight: 500;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+
+          :deep(svg) {
+            margin-right: 6px;
+          }
+
+          &[type="outline"] {
+            border: 2px solid #667eea;
+            color: #667eea;
+
+            &:hover {
+              background: #667eea;
+              color: white;
+              transform: translateY(-2px);
+              box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            }
+          }
+
+          &[type="primary"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+
+            &:hover {
+              opacity: 0.9;
+              transform: translateY(-2px);
+              box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .knowledge-grid, .exercise-grid {
     grid-template-columns: 1fr;
@@ -1419,6 +1877,48 @@ img {
 
   .knowledge-content {
     padding: 20px;
+  }
+
+  .knowledge-detail {
+    .detail-image-wrapper {
+      height: 250px;
+    }
+
+    .detail-content {
+      padding: 20px;
+
+      .content-section {
+        margin-bottom: 24px;
+
+        .content-text p {
+          font-size: 15px;
+        }
+      }
+
+      .tips-section {
+        padding: 16px;
+
+        .tips-list .tip-item {
+          padding: 12px;
+
+          .tip-text {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+
+  .modal-title-wrapper {
+    h3 {
+      font-size: 20px;
+    }
+
+    .title-meta {
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+    }
   }
 }
 </style>
