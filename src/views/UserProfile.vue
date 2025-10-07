@@ -37,45 +37,6 @@
         </div>
       </div>
 
-      <!-- 健身目标设定 -->
-      <div class="goals-card">
-        <div class="card-header">
-          <h3><icon-star />健身目标</h3>
-          <a-button type="primary" size="small" @click="showGoalModal = true">
-            <icon-plus />设定目标
-          </a-button>
-        </div>
-        <div class="goals-list">
-          <div v-for="goal in fitnessGoals" :key="goal.id" class="goal-item">
-            <div class="goal-info">
-              <h4>{{ goal.title }}</h4>
-              <p>{{ goal.description }}</p>
-              <div class="goal-progress">
-                <a-progress 
-                  :percent="goal.progress" 
-                  :color="getProgressColor(goal.progress)"
-                  size="small"
-                />
-                <span class="progress-text">{{ goal.progress }}%</span>
-              </div>
-            </div>
-            <div class="goal-actions">
-              <a-button type="text" size="small" @click="editGoal(goal)">
-                <icon-edit />
-              </a-button>
-              <a-button type="text" size="small" status="danger" @click="deleteGoal(goal.id)">
-                <icon-delete />
-              </a-button>
-            </div>
-          </div>
-          <div v-if="fitnessGoals.length === 0" class="empty-goals">
-            <icon-star />
-            <p>还没有设定健身目标</p>
-            <a-button type="primary" @click="showGoalModal = true">立即设定</a-button>
-          </div>
-        </div>
-      </div>
-
       <!-- 身体数据记录 -->
       <div class="body-data-card">
         <div class="card-header">
@@ -97,46 +58,23 @@
         <div class="latest-data">
           <div class="data-item">
             <span class="label">最新体重</span>
-            <span class="value">{{ latestBodyData.weight || '--' }} kg</span>
+            <span class="value">{{ latestBodyData.weight || '--' }} <span class="unit">kg</span></span>
           </div>
           <div class="data-item">
             <span class="label">最新体脂率</span>
-            <span class="value">{{ latestBodyData.bodyFat || '--' }}%</span>
+            <span class="value">{{ latestBodyData.bodyFat || '--' }}<span class="unit">%</span></span>
           </div>
           <div class="data-item">
             <span class="label">BMI指数</span>
-            <span class="value">{{ calculateBMI() || '--' }}</span>
+            <span class="value">{{ latestBodyData.bmi || calculateBMI() || '--' }}</span>
+          </div>
+          <div class="data-item">
+            <span class="label">最新身高</span>
+            <span class="value">{{ latestBodyData.height || '--' }} <span class="unit">cm</span></span>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- 设定目标弹窗 -->
-    <a-modal v-model:visible="showGoalModal" title="设定健身目标" @ok="saveGoal">
-      <a-form :model="goalForm" layout="vertical">
-        <a-form-item label="目标类型">
-          <a-select v-model="goalForm.type" placeholder="选择目标类型">
-            <a-option value="weight_loss">减重</a-option>
-            <a-option value="muscle_gain">增肌</a-option>
-            <a-option value="endurance">提升耐力</a-option>
-            <a-option value="strength">增强力量</a-option>
-            <a-option value="flexibility">提升柔韧性</a-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item label="目标标题">
-          <a-input v-model="goalForm.title" placeholder="输入目标标题" />
-        </a-form-item>
-        <a-form-item label="目标描述">
-          <a-textarea v-model="goalForm.description" placeholder="详细描述您的健身目标" />
-        </a-form-item>
-        <a-form-item label="目标数值">
-          <a-input-number v-model="goalForm.targetValue" placeholder="目标数值" />
-        </a-form-item>
-        <a-form-item label="截止日期">
-          <a-date-picker v-model="goalForm.deadline" style="width: 100%" />
-        </a-form-item>
-      </a-form>
-    </a-modal>
 
     <!-- 记录身体数据弹窗 -->
     <a-modal v-model:visible="showDataModal" title="记录身体数据" @ok="saveBodyData">
@@ -256,7 +194,7 @@
 <script>
 import { ref, reactive, onMounted } from 'vue';
 import {
-  IconUser, IconCamera, IconStar, IconPlus, IconEdit, IconDelete, IconHeart, IconUpload, IconClose
+  IconUser, IconCamera, IconPlus, IconHeart, IconUpload
 } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
 import ApiService from '@/services/api';
@@ -265,8 +203,7 @@ import { useUserStore } from '@/stores/user';
 export default {
   name: 'UserProfile',
   components: {
-    // eslint-disable-next-line vue/no-unused-components
-    IconUser, IconCamera, IconStar, IconPlus, IconEdit, IconDelete, IconHeart, IconUpload, IconClose
+    IconUser, IconCamera, IconPlus, IconHeart, IconUpload
   },
   setup() {
     // 用户状态管理
@@ -279,11 +216,14 @@ export default {
       totalDays: 0,
       currentStreak: 0
     });
-    const fitnessGoals = ref([]);
-    const latestBodyData = ref({});
+    const latestBodyData = ref({
+      weight: null,
+      bodyFat: null,
+      bmi: null,
+      height: null
+    });
 
     // 弹窗控制
-    const showGoalModal = ref(false);
     const showDataModal = ref(false);
     const showAvatarUpload = ref(false);
 
@@ -296,14 +236,6 @@ export default {
     const fileInputRef = ref(null);
     
     // 表单数据
-    const goalForm = reactive({
-      type: '',
-      title: '',
-      description: '',
-      targetValue: null,
-      deadline: null
-    });
-    
     const bodyDataForm = reactive({
       weight: null,
       bodyFat: null,
@@ -342,11 +274,6 @@ export default {
       return new Date(dateString).toLocaleDateString('zh-CN');
     };
 
-    const getProgressColor = (progress) => {
-      if (progress >= 80) return '#00b42a';
-      if (progress >= 50) return '#ff7d00';
-      return '#f53f3f';
-    };
 
     // BMI计算相关方法
     const getBMIStatusClass = (bmi) => {
@@ -392,23 +319,6 @@ export default {
       return null;
     };
 
-    const saveGoal = () => {
-      // 这里应该调用API保存目标
-      const newGoal = {
-        id: Date.now(),
-        ...goalForm,
-        progress: 0,
-        createdAt: new Date()
-      };
-      fitnessGoals.value.push(newGoal);
-      showGoalModal.value = false;
-      
-      // 重置表单
-      Object.keys(goalForm).forEach(key => {
-        goalForm[key] = key === 'targetValue' ? null : '';
-      });
-    };
-
     const saveBodyData = () => {
       // 这里应该调用API保存身体数据
       latestBodyData.value = { ...bodyDataForm };
@@ -426,17 +336,6 @@ export default {
       });
     };
 
-    const editGoal = (goal) => {
-      Object.assign(goalForm, goal);
-      showGoalModal.value = true;
-    };
-
-    const deleteGoal = (goalId) => {
-      const index = fitnessGoals.value.findIndex(g => g.id === goalId);
-      if (index > -1) {
-        fitnessGoals.value.splice(index, 1);
-      }
-    };
 
     // 头像上传相关方法
     const handleBeforeUpload = (file) => {
@@ -614,26 +513,119 @@ export default {
       }
     };
 
+    // 加载健身数据
+    const loadFitnessData = async () => {
+      try {
+        const response = await ApiService.getMyFitnessDataByPage({
+          current: 1,
+          pageSize: 1  // 只获取最新一条记录
+        });
+
+        if (response.code === 0 && response.data?.records?.length > 0) {
+          const latest = response.data.records[0];
+          latestBodyData.value = {
+            weight: latest.weight,
+            bodyFat: latest.bodyFat,
+            bmi: latest.bmi,
+            height: latest.height
+          };
+        }
+      } catch (error) {
+        console.error('加载健身数据失败:', error);
+      }
+    };
+
+    // 加载运动统计数据
+    const loadExerciseStats = async () => {
+      try {
+        const response = await ApiService.getMyExerciseLogByPage({
+          current: 1,
+          pageSize: 100  // 获取足够多的数据用于统计
+        });
+
+        if (response.code === 0 && response.data?.records) {
+          const records = response.data.records;
+          
+          // 计算统计数据
+          const now = new Date();
+          const uniqueDates = new Set();
+          
+          records.forEach(record => {
+            const recordDate = new Date(record.dateRecorded);
+            const dateStr = recordDate.toISOString().split('T')[0];
+            uniqueDates.add(dateStr);
+          });
+
+          // 计算连续天数
+          const sortedDates = Array.from(uniqueDates).sort((a, b) => new Date(b) - new Date(a));
+          let consecutiveDays = 0;
+          
+          if (sortedDates.length > 0) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const latestDate = new Date(sortedDates[0]);
+            latestDate.setHours(0, 0, 0, 0);
+            
+            const daysDiff = Math.floor((today - latestDate) / (1000 * 60 * 60 * 24));
+            
+            if (daysDiff <= 1) {
+              consecutiveDays = 1;
+              let currentDate = latestDate;
+              
+              for (let i = 1; i < sortedDates.length; i++) {
+                const prevDate = new Date(sortedDates[i]);
+                prevDate.setHours(0, 0, 0, 0);
+                
+                const expectedDate = new Date(currentDate);
+                expectedDate.setDate(expectedDate.getDate() - 1);
+                
+                if (prevDate.getTime() === expectedDate.getTime()) {
+                  consecutiveDays++;
+                  currentDate = prevDate;
+                } else {
+                  break;
+                }
+              }
+            }
+          }
+
+          fitnessStats.value = {
+            totalWorkouts: records.length,
+            totalDays: uniqueDates.size,
+            currentStreak: consecutiveDays
+          };
+        } else {
+          fitnessStats.value = {
+            totalWorkouts: 0,
+            totalDays: 0,
+            currentStreak: 0
+          };
+        }
+      } catch (error) {
+        console.error('加载运动统计失败:', error);
+        fitnessStats.value = {
+          totalWorkouts: 0,
+          totalDays: 0,
+          currentStreak: 0
+        };
+      }
+    };
+
     // 生命周期
-    onMounted(() => {
-      loadUserInfo();
-      // 模拟数据
-      fitnessStats.value = {
-        totalWorkouts: 45,
-        totalDays: 30,
-        currentStreak: 7
-      };
+    onMounted(async () => {
+      await loadUserInfo();
+      await Promise.all([
+        loadFitnessData(),
+        loadExerciseStats()
+      ]);
     });
 
     return {
       userInfo,
       fitnessStats,
-      fitnessGoals,
       latestBodyData,
-      showGoalModal,
       showDataModal,
       showAvatarUpload,
-      goalForm,
       bodyDataForm,
       // 头像上传相关
       fileList,
@@ -656,12 +648,8 @@ export default {
       // 其他方法
       getRoleText,
       formatDate,
-      getProgressColor,
       calculateBMI,
-      saveGoal,
-      saveBodyData,
-      editGoal,
-      deleteGoal
+      saveBodyData
     };
   }
 };
@@ -679,11 +667,11 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 24px;
 }
 
-.profile-card, .goals-card, .body-data-card {
+.profile-card, .body-data-card {
   background: white;
   border-radius: 16px;
   padding: 24px;
@@ -691,10 +679,6 @@ export default {
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.profile-card {
-  grid-column: 1 / -1;
 }
 
 .profile-header {
@@ -801,97 +785,38 @@ export default {
   }
 }
 
-.goals-list {
-  .goal-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
-    border: 1px solid #f0f0f0;
-    border-radius: 8px;
-    margin-bottom: 12px;
+.data-charts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+
+  .chart-item {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
     transition: all 0.3s ease;
 
     &:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       transform: translateY(-2px);
     }
 
-    .goal-info {
-      flex: 1;
-
-      h4 {
-        margin: 0 0 4px 0;
-        font-size: 16px;
-        font-weight: 600;
-        color: #333;
-      }
-
-      p {
-        margin: 0 0 8px 0;
-        color: #666;
-        font-size: 14px;
-      }
-
-      .goal-progress {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-
-        .progress-text {
-          font-size: 14px;
-          font-weight: 500;
-          color: #4080ff;
-        }
-      }
-    }
-
-    .goal-actions {
-      display: flex;
-      gap: 8px;
-    }
-  }
-
-  .empty-goals {
-    text-align: center;
-    padding: 40px 20px;
-    color: #666;
-
-    :deep(svg) {
-      font-size: 48px;
-      color: #d9d9d9;
-      margin-bottom: 16px;
-    }
-
-    p {
-      margin: 0 0 16px 0;
-      font-size: 16px;
-    }
-  }
-}
-
-.data-charts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
-
-  .chart-item {
     h4 {
-      margin: 0 0 12px 0;
-      font-size: 16px;
+      margin: 0 0 16px 0;
+      font-size: 18px;
       font-weight: 600;
       color: #333;
     }
 
     .chart-container {
-      height: 200px;
-      background: #f8f9fa;
+      height: 220px;
+      background: white;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #666;
+      color: #999;
       font-size: 14px;
     }
   }
@@ -899,25 +824,42 @@ export default {
 
 .latest-data {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  padding-top: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding-top: 24px;
   border-top: 1px solid #f0f0f0;
 
   .data-item {
     text-align: center;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #e8f4ff;
+      transform: translateY(-2px);
+    }
 
     .label {
       display: block;
       font-size: 14px;
       color: #666;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
+      font-weight: 500;
     }
 
     .value {
-      font-size: 20px;
-      font-weight: 600;
+      font-size: 24px;
+      font-weight: 700;
       color: #4080ff;
+
+      .unit {
+        font-size: 16px;
+        font-weight: 500;
+        color: #666;
+        margin-left: 4px;
+      }
     }
   }
 }
@@ -950,18 +892,8 @@ export default {
   }
 
   .latest-data {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
-  }
-
-  .goal-item {
-    flex-direction: column;
-    align-items: flex-start;
-
-    .goal-actions {
-      margin-top: 12px;
-      align-self: flex-end;
-    }
   }
 }
 
