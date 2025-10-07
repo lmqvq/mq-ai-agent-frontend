@@ -112,7 +112,7 @@
             </div>
             <div class="card-content">
               <h3>本周训练</h3>
-              <div class="value">5 <span>次</span></div>
+              <div class="value">{{ workoutStats.thisWeek }} <span>次</span></div>
             </div>
           </div>
           <div class="overview-card">
@@ -120,8 +120,8 @@
               <icon-fire />
             </div>
             <div class="card-content">
-              <h3>消耗卡路里</h3>
-              <div class="value">1,250 <span>kcal</span></div>
+              <h3>总消耗卡路里</h3>
+              <div class="value">{{ workoutStats.totalCalories.toLocaleString() }} <span>kcal</span></div>
             </div>
           </div>
           <div class="overview-card">
@@ -129,8 +129,8 @@
               <icon-clock-circle />
             </div>
             <div class="card-content">
-              <h3>训练时长</h3>
-              <div class="value">3.5 <span>小时</span></div>
+              <h3>平均时长</h3>
+              <div class="value">{{ workoutStats.avgDuration }} <span>分钟</span></div>
             </div>
           </div>
           <div class="overview-card">
@@ -139,7 +139,7 @@
             </div>
             <div class="card-content">
               <h3>连续天数</h3>
-              <div class="value">7 <span>天</span></div>
+              <div class="value">{{ workoutStats.consecutiveDays }} <span>天</span></div>
             </div>
           </div>
         </div>
@@ -158,6 +158,7 @@ import {
 } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
 import { useUserStore } from '@/stores/user';
+import ApiService from '@/services/api';
 
 export default {
   name: 'HomePage',
@@ -180,6 +181,14 @@ export default {
     const userStore = useUserStore();
     const showUserMenu = ref(false);
     const userInfoRef = ref(null);
+
+    // 运动数据统计
+    const workoutStats = ref({
+      thisWeek: 0,
+      totalCalories: 0,
+      avgDuration: 0,
+      consecutiveDays: 0
+    });
 
     // 应用列表
     const apps = [
@@ -266,9 +275,134 @@ export default {
       return userStore.getRoleText(role);
     };
 
+    // 加载运动数据统计
+    const loadExerciseStats = async () => {
+      try {
+        const response = await ApiService.getMyExerciseLogByPage({
+          current: 1,
+          pageSize: 100  // 获取足够多的数据用于统计
+        });
+
+        if (response.code === 0 && response.data?.records) {
+          calculateWorkoutStats(response.data.records);
+        } else {
+          // 如果没有数据或者加载失败，使用默认值
+          workoutStats.value = {
+            thisWeek: 0,
+            totalCalories: 0,
+            avgDuration: 0,
+            consecutiveDays: 0
+          };
+        }
+      } catch (error) {
+        console.error('加载运动数据失败:', error);
+        // 静默失败，使用默认值
+        workoutStats.value = {
+          thisWeek: 0,
+          totalCalories: 0,
+          avgDuration: 0,
+          consecutiveDays: 0
+        };
+      }
+    };
+
+    // 计算运动统计数据
+    const calculateWorkoutStats = (records) => {
+      if (!records || records.length === 0) {
+        workoutStats.value = {
+          thisWeek: 0,
+          totalCalories: 0,
+          avgDuration: 0,
+          consecutiveDays: 0
+        };
+        return;
+      }
+
+      const now = new Date();
+      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+      let weekCount = 0;
+      let totalCalories = 0;
+      let totalDuration = 0;
+
+      records.forEach(record => {
+        const recordDate = new Date(record.dateRecorded);
+        
+        if (recordDate >= oneWeekAgo) {
+          weekCount++;
+        }
+        
+        totalCalories += record.caloriesBurned || 0;
+        totalDuration += record.duration || 0;
+      });
+
+      const avgDuration = records.length > 0 ? Math.round(totalDuration / records.length) : 0;
+      
+      // 计算连续训练天数
+      const consecutiveDays = calculateConsecutiveDays(records);
+
+      workoutStats.value = {
+        thisWeek: weekCount,
+        totalCalories: Math.round(totalCalories),
+        avgDuration: avgDuration,
+        consecutiveDays: consecutiveDays
+      };
+    };
+
+    // 计算连续训练天数
+    const calculateConsecutiveDays = (records) => {
+      if (!records || records.length === 0) return 0;
+
+      // 按日期降序排列（最新的在前）
+      const sortedRecords = [...records].sort((a, b) => 
+        new Date(b.dateRecorded) - new Date(a.dateRecorded)
+      );
+
+      // 获取所有训练日期（去重）
+      const uniqueDates = [...new Set(sortedRecords.map(record => {
+        const date = new Date(record.dateRecorded);
+        return date.toISOString().split('T')[0];
+      }))];
+
+      if (uniqueDates.length === 0) return 0;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const latestWorkoutDate = new Date(uniqueDates[0]);
+      latestWorkoutDate.setHours(0, 0, 0, 0);
+
+      // 如果最后一次训练不是今天或昨天，连续天数为0
+      const daysDiff = Math.floor((today - latestWorkoutDate) / (1000 * 60 * 60 * 24));
+      if (daysDiff > 1) return 0;
+
+      // 计算连续天数
+      let consecutive = 1;
+      let currentDate = new Date(latestWorkoutDate);
+
+      for (let i = 1; i < uniqueDates.length; i++) {
+        const prevDate = new Date(uniqueDates[i]);
+        prevDate.setHours(0, 0, 0, 0);
+        
+        const expectedDate = new Date(currentDate);
+        expectedDate.setDate(expectedDate.getDate() - 1);
+        
+        if (prevDate.getTime() === expectedDate.getTime()) {
+          consecutive++;
+          currentDate = prevDate;
+        } else {
+          break;
+        }
+      }
+
+      return consecutive;
+    };
+
     // 组件挂载时检查登录状态
     onMounted(async () => {
       await userStore.checkLoginStatus();
+      // 加载运动数据统计
+      await loadExerciseStats();
       // 添加全局点击事件监听
       document.addEventListener('click', handleClickOutside);
     });
@@ -284,6 +418,7 @@ export default {
       userInfoRef,
       isLoggedIn: userStore.isLoggedIn,
       userInfo: userStore.userInfo,
+      workoutStats,
       goToLogin,
       toggleUserMenu,
       goToProfile,
