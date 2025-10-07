@@ -518,7 +518,7 @@ export default {
       try {
         const response = await ApiService.getMyFitnessDataByPage({
           current: 1,
-          pageSize: 1  // 只获取最新一条记录
+          pageSize: 10  // 获取更多记录以确保有数据
         });
 
         if (response.code === 0 && response.data?.records?.length > 0) {
@@ -529,9 +529,20 @@ export default {
             bmi: latest.bmi,
             height: latest.height
           };
+          console.log('健身数据加载成功:', latestBodyData.value);
+        } else {
+          console.log('没有健身数据记录');
+          // 保持默认值
+          latestBodyData.value = {
+            weight: null,
+            bodyFat: null,
+            bmi: null,
+            height: null
+          };
         }
       } catch (error) {
         console.error('加载健身数据失败:', error);
+        // 静默失败，保持默认值
       }
     };
 
@@ -547,6 +558,7 @@ export default {
           const records = response.data.records;
           
           // 计算统计数据
+          // eslint-disable-next-line no-unused-vars
           const now = new Date();
           const uniqueDates = new Set();
           
@@ -613,11 +625,15 @@ export default {
 
     // 生命周期
     onMounted(async () => {
-      await loadUserInfo();
-      await Promise.all([
-        loadFitnessData(),
-        loadExerciseStats()
-      ]);
+      try {
+        await loadUserInfo();
+        // 串行加载，确保每个请求都完成
+        await loadFitnessData();
+        await loadExerciseStats();
+        console.log('所有数据加载完成');
+      } catch (error) {
+        console.error('数据加载错误:', error);
+      }
     });
 
     return {
@@ -658,7 +674,7 @@ export default {
 <style lang="scss" scoped>
 .user-profile {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ffffff;
   padding: 20px;
   padding-bottom: 80px;
 }
@@ -672,36 +688,46 @@ export default {
 }
 
 .profile-card, .body-data-card {
-  background: white;
+  background: #ffffff;
   border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 32px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  }
 }
 
 .profile-header {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 
   .avatar-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-right: 24px;
+    margin-right: 32px;
 
     .avatar {
-      width: 80px;
-      height: 80px;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
-      background: linear-gradient(45deg, #4080ff, #40a9ff);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       overflow: hidden;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
 
       img {
         width: 100%;
@@ -710,8 +736,8 @@ export default {
       }
 
       :deep(svg) {
-        width: 32px;
-        height: 32px;
+        width: 40px;
+        height: 40px;
         color: white;
       }
     }
@@ -721,21 +747,26 @@ export default {
     flex: 1;
 
     h2 {
-      margin: 0 0 8px 0;
-      font-size: 28px;
-      font-weight: 700;
-      color: #333;
+      margin: 0 0 12px 0;
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
     }
 
     .user-role {
-      margin: 0 0 4px 0;
-      color: #4080ff;
-      font-weight: 500;
+      margin: 0 0 8px 0;
+      color: #667eea;
+      font-weight: 600;
+      font-size: 16px;
     }
 
     .join-date {
       margin: 0;
-      color: #666;
+      color: #999;
       font-size: 14px;
     }
   }
@@ -744,22 +775,36 @@ export default {
 .profile-stats {
   display: flex;
   justify-content: space-around;
-  padding: 20px 0;
+  padding: 24px 0 0;
   border-top: 1px solid #f0f0f0;
+  margin-top: 8px;
 
   .stat-item {
     text-align: center;
+    padding: 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+      transform: translateY(-2px);
+    }
 
     .stat-number {
-      font-size: 32px;
-      font-weight: 700;
-      color: #4080ff;
-      margin-bottom: 4px;
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
     }
 
     .stat-label {
       font-size: 14px;
       color: #666;
+      font-weight: 500;
     }
   }
 }
@@ -768,19 +813,25 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
 
   h3 {
     margin: 0;
-    font-size: 20px;
-    font-weight: 600;
-    color: #333;
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 
     :deep(svg) {
-      color: #4080ff;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
   }
 }
@@ -789,35 +840,38 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 
   .chart-item {
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     border-radius: 12px;
-    padding: 20px;
+    padding: 24px;
     transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
 
     &:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
       transform: translateY(-2px);
+      border-color: #667eea;
     }
 
     h4 {
-      margin: 0 0 16px 0;
+      margin: 0 0 20px 0;
       font-size: 18px;
-      font-weight: 600;
+      font-weight: 700;
       color: #333;
     }
 
     .chart-container {
       height: 220px;
-      background: white;
+      background: #ffffff;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #999;
       font-size: 14px;
+      border: 1px dashed #e0e0e0;
     }
   }
 }
@@ -825,39 +879,46 @@ export default {
 .latest-data {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  padding-top: 24px;
+  gap: 24px;
+  padding-top: 28px;
   border-top: 1px solid #f0f0f0;
 
   .data-item {
     text-align: center;
-    padding: 16px;
-    background: #f8f9fa;
-    border-radius: 10px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 12px;
     transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
 
     &:hover {
-      background: #e8f4ff;
-      transform: translateY(-2px);
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+      border-color: #667eea;
     }
 
     .label {
       display: block;
       font-size: 14px;
       color: #666;
-      margin-bottom: 8px;
-      font-weight: 500;
+      margin-bottom: 12px;
+      font-weight: 600;
     }
 
     .value {
-      font-size: 24px;
-      font-weight: 700;
-      color: #4080ff;
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
 
       .unit {
         font-size: 16px;
-        font-weight: 500;
-        color: #666;
+        font-weight: 600;
+        color: #999;
         margin-left: 4px;
       }
     }
