@@ -344,6 +344,7 @@ export default {
     };
 
     // 计算体脂率
+    // eslint-disable-next-line no-unused-vars
     const calculateBodyFatPercentage = () => {
       // 检查是否所有必要数据都已输入
       if (!bodyDataForm.gender || !bodyDataForm.age || !bodyDataForm.height || !bodyDataForm.weight) {

@@ -27,6 +27,10 @@
           <icon-bar-chart />
           <span>健身数据</span>
         </router-link>
+        <router-link to="/ranking" class="menu-item" active-class="active" v-if="isLoggedIn">
+          <icon-trophy />
+          <span>健身排行榜</span>
+        </router-link>
         <router-link to="/knowledge" class="menu-item" active-class="active">
           <icon-book />
           <span>健身知识</span>

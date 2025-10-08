@@ -858,6 +858,41 @@ const ApiService = {
         } catch (error) {
             throw error.response?.data || error
         }
+    },
+
+    // ==================== 健身排行榜相关 ====================
+
+    /**
+     * 获取排行榜列表
+     * @param {Object} queryParams 查询参数
+     * @param {number} queryParams.current 当前页
+     * @param {number} queryParams.pageSize 页面大小
+     * @param {string} queryParams.sortField 排序字段
+     * @param {string} queryParams.sortOrder 排序方式
+     * @param {string} queryParams.rankingType 排行榜类型
+     * @returns {Promise} 排行榜数据
+     */
+    async getRankingList(queryParams) {
+        try {
+            const response = await apiClient.post('/fitness/ranking/list', queryParams)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
+    },
+
+    /**
+     * 获取我的排名
+     * @param {string} rankingType 排行榜类型
+     * @returns {Promise} 我的排名数据
+     */
+    async getMyRanking(rankingType) {
+        try {
+            const response = await apiClient.get(`/fitness/ranking/my?rankingType=${rankingType}`)
+            return response.data
+        } catch (error) {
+            throw error.response?.data || error
+        }
     }
 }
 

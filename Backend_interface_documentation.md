@@ -601,6 +601,1764 @@
 ```
 
 
+# fitness-controller
+
+
+## addFitnessData
+
+
+**接口地址**:`/api/fitness/data/add`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "weight": 0,
+  "bodyFat": 0,
+  "height": 0,
+  "dateRecorded": ""
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|fitnessDataAddRequest|FitnessDataAddRequest|body|true|FitnessDataAddRequest|FitnessDataAddRequest|
+|&emsp;&emsp;weight|||false|number(float)||
+|&emsp;&emsp;bodyFat|||false|number(float)||
+|&emsp;&emsp;height|||false|number(float)||
+|&emsp;&emsp;dateRecorded|||false|string(date-time)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseLong|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||integer(int64)|integer(int64)|
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": 0,
+	"message": ""
+}
+```
+
+
+## deleteFitnessData
+
+
+**接口地址**:`/api/fitness/data/delete`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "id": 0
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|deleteRequest|DeleteRequest|body|true|DeleteRequest|DeleteRequest|
+|&emsp;&emsp;id|||false|integer(int64)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseBoolean|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||boolean||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": true,
+	"message": ""
+}
+```
+
+
+## getFitnessDataById
+
+
+**接口地址**:`/api/fitness/data/get`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|id||query|true|integer(int64)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseFitnessDataVO|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||FitnessDataVO|FitnessDataVO|
+|&emsp;&emsp;id||integer(int64)||
+|&emsp;&emsp;userId||integer(int64)||
+|&emsp;&emsp;weight||number(float)||
+|&emsp;&emsp;bodyFat||number(float)||
+|&emsp;&emsp;height||number(float)||
+|&emsp;&emsp;bmi||number(float)||
+|&emsp;&emsp;dateRecorded||string(date-time)||
+|&emsp;&emsp;createTime||string(date-time)||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": {
+		"id": 0,
+		"userId": 0,
+		"weight": 0,
+		"bodyFat": 0,
+		"height": 0,
+		"bmi": 0,
+		"dateRecorded": "",
+		"createTime": ""
+	},
+	"message": ""
+}
+```
+
+
+## listFitnessDataByPage
+
+
+**接口地址**:`/api/fitness/data/list/page`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "current": 0,
+  "pageSize": 0,
+  "sortField": "",
+  "sortOrder": "",
+  "userId": 0,
+  "startDate": "",
+  "endDate": ""
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|fitnessDataQueryRequest|FitnessDataQueryRequest|body|true|FitnessDataQueryRequest|FitnessDataQueryRequest|
+|&emsp;&emsp;current|||false|integer(int32)||
+|&emsp;&emsp;pageSize|||false|integer(int32)||
+|&emsp;&emsp;sortField|||false|string||
+|&emsp;&emsp;sortOrder|||false|string||
+|&emsp;&emsp;userId|||false|integer(int64)||
+|&emsp;&emsp;startDate|||false|string(date-time)||
+|&emsp;&emsp;endDate|||false|string(date-time)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponsePageFitnessDataVO|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||PageFitnessDataVO|PageFitnessDataVO|
+|&emsp;&emsp;records||array|FitnessDataVO|
+|&emsp;&emsp;&emsp;&emsp;id||integer||
+|&emsp;&emsp;&emsp;&emsp;userId||integer||
+|&emsp;&emsp;&emsp;&emsp;weight||number||
+|&emsp;&emsp;&emsp;&emsp;bodyFat||number||
+|&emsp;&emsp;&emsp;&emsp;height||number||
+|&emsp;&emsp;&emsp;&emsp;bmi||number||
+|&emsp;&emsp;&emsp;&emsp;dateRecorded||string||
+|&emsp;&emsp;&emsp;&emsp;createTime||string||
+|&emsp;&emsp;total||integer(int64)||
+|&emsp;&emsp;size||integer(int64)||
+|&emsp;&emsp;current||integer(int64)||
+|&emsp;&emsp;orders||array|OrderItem|
+|&emsp;&emsp;&emsp;&emsp;column||string||
+|&emsp;&emsp;&emsp;&emsp;asc||boolean||
+|&emsp;&emsp;optimizeCountSql||PageFitnessDataVO|PageFitnessDataVO|
+|&emsp;&emsp;searchCount||PageFitnessDataVO|PageFitnessDataVO|
+|&emsp;&emsp;optimizeJoinOfCountSql||boolean||
+|&emsp;&emsp;maxLimit||integer(int64)||
+|&emsp;&emsp;countId||string||
+|&emsp;&emsp;pages||integer(int64)||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": {
+		"records": [
+			{
+				"id": 0,
+				"userId": 0,
+				"weight": 0,
+				"bodyFat": 0,
+				"height": 0,
+				"bmi": 0,
+				"dateRecorded": "",
+				"createTime": ""
+			}
+		],
+		"total": 0,
+		"size": 0,
+		"current": 0,
+		"orders": [
+			{
+				"column": "",
+				"asc": true
+			}
+		],
+		"optimizeCountSql": {},
+		"searchCount": {},
+		"optimizeJoinOfCountSql": true,
+		"maxLimit": 0,
+		"countId": "",
+		"pages": 0
+	},
+	"message": ""
+}
+```
+
+
+## listMyFitnessDataByPage
+
+
+**接口地址**:`/api/fitness/data/my/list/page`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "current": 0,
+  "pageSize": 0,
+  "sortField": "",
+  "sortOrder": "",
+  "userId": 0,
+  "startDate": "",
+  "endDate": ""
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|fitnessDataQueryRequest|FitnessDataQueryRequest|body|true|FitnessDataQueryRequest|FitnessDataQueryRequest|
+|&emsp;&emsp;current|||false|integer(int32)||
+|&emsp;&emsp;pageSize|||false|integer(int32)||
+|&emsp;&emsp;sortField|||false|string||
+|&emsp;&emsp;sortOrder|||false|string||
+|&emsp;&emsp;userId|||false|integer(int64)||
+|&emsp;&emsp;startDate|||false|string(date-time)||
+|&emsp;&emsp;endDate|||false|string(date-time)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponsePageFitnessDataVO|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||PageFitnessDataVO|PageFitnessDataVO|
+|&emsp;&emsp;records||array|FitnessDataVO|
+|&emsp;&emsp;&emsp;&emsp;id||integer||
+|&emsp;&emsp;&emsp;&emsp;userId||integer||
+|&emsp;&emsp;&emsp;&emsp;weight||number||
+|&emsp;&emsp;&emsp;&emsp;bodyFat||number||
+|&emsp;&emsp;&emsp;&emsp;height||number||
+|&emsp;&emsp;&emsp;&emsp;bmi||number||
+|&emsp;&emsp;&emsp;&emsp;dateRecorded||string||
+|&emsp;&emsp;&emsp;&emsp;createTime||string||
+|&emsp;&emsp;total||integer(int64)||
+|&emsp;&emsp;size||integer(int64)||
+|&emsp;&emsp;current||integer(int64)||
+|&emsp;&emsp;orders||array|OrderItem|
+|&emsp;&emsp;&emsp;&emsp;column||string||
+|&emsp;&emsp;&emsp;&emsp;asc||boolean||
+|&emsp;&emsp;optimizeCountSql||PageFitnessDataVO|PageFitnessDataVO|
+|&emsp;&emsp;searchCount||PageFitnessDataVO|PageFitnessDataVO|
+|&emsp;&emsp;optimizeJoinOfCountSql||boolean||
+|&emsp;&emsp;maxLimit||integer(int64)||
+|&emsp;&emsp;countId||string||
+|&emsp;&emsp;pages||integer(int64)||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": {
+		"records": [
+			{
+				"id": 0,
+				"userId": 0,
+				"weight": 0,
+				"bodyFat": 0,
+				"height": 0,
+				"bmi": 0,
+				"dateRecorded": "",
+				"createTime": ""
+			}
+		],
+		"total": 0,
+		"size": 0,
+		"current": 0,
+		"orders": [
+			{
+				"column": "",
+				"asc": true
+			}
+		],
+		"optimizeCountSql": {},
+		"searchCount": {},
+		"optimizeJoinOfCountSql": true,
+		"maxLimit": 0,
+		"countId": "",
+		"pages": 0
+	},
+	"message": ""
+}
+```
+
+
+## getFitnessTrends
+
+
+**接口地址**:`/api/fitness/data/trends`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|days||query|false|integer(int32)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseListFitnessDataVO|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||array|FitnessDataVO|
+|&emsp;&emsp;id||integer(int64)||
+|&emsp;&emsp;userId||integer(int64)||
+|&emsp;&emsp;weight||number(float)||
+|&emsp;&emsp;bodyFat||number(float)||
+|&emsp;&emsp;height||number(float)||
+|&emsp;&emsp;bmi||number(float)||
+|&emsp;&emsp;dateRecorded||string(date-time)||
+|&emsp;&emsp;createTime||string(date-time)||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": [
+		{
+			"id": 0,
+			"userId": 0,
+			"weight": 0,
+			"bodyFat": 0,
+			"height": 0,
+			"bmi": 0,
+			"dateRecorded": "",
+			"createTime": ""
+		}
+	],
+	"message": ""
+}
+```
+
+
+## updateFitnessData
+
+
+**接口地址**:`/api/fitness/data/update`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "id": 0,
+  "weight": 0,
+  "bodyFat": 0,
+  "height": 0,
+  "dateRecorded": ""
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|fitnessDataUpdateRequest|FitnessDataUpdateRequest|body|true|FitnessDataUpdateRequest|FitnessDataUpdateRequest|
+|&emsp;&emsp;id|||false|integer(int64)||
+|&emsp;&emsp;weight|||false|number(float)||
+|&emsp;&emsp;bodyFat|||false|number(float)||
+|&emsp;&emsp;height|||false|number(float)||
+|&emsp;&emsp;dateRecorded|||false|string(date-time)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseBoolean|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||boolean||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": true,
+	"message": ""
+}
+```
+
+
+## addExerciseLog
+
+
+**接口地址**:`/api/fitness/exercise/add`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "exerciseType": "",
+  "duration": 0,
+  "caloriesBurned": 0,
+  "dateRecorded": "",
+  "notes": ""
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|exerciseLogAddRequest|ExerciseLogAddRequest|body|true|ExerciseLogAddRequest|ExerciseLogAddRequest|
+|&emsp;&emsp;exerciseType|||false|string||
+|&emsp;&emsp;duration|||false|integer(int32)||
+|&emsp;&emsp;caloriesBurned|||false|number(float)||
+|&emsp;&emsp;dateRecorded|||false|string(date-time)||
+|&emsp;&emsp;notes|||false|string||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseLong|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||integer(int64)|integer(int64)|
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": 0,
+	"message": ""
+}
+```
+
+
+## getTotalCaloriesBurned
+
+
+**接口地址**:`/api/fitness/exercise/calories`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|days||query|false|integer(int32)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseFloat|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||number(float)|number(float)|
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": 0,
+	"message": ""
+}
+```
+
+
+## deleteExerciseLog
+
+
+**接口地址**:`/api/fitness/exercise/delete`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "id": 0
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|deleteRequest|DeleteRequest|body|true|DeleteRequest|DeleteRequest|
+|&emsp;&emsp;id|||false|integer(int64)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseBoolean|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||boolean||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": true,
+	"message": ""
+}
+```
+
+
+## listMyExerciseLogByPage
+
+
+**接口地址**:`/api/fitness/exercise/my/list/page`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "current": 0,
+  "pageSize": 0,
+  "sortField": "",
+  "sortOrder": "",
+  "userId": 0,
+  "exerciseType": "",
+  "startDate": "",
+  "endDate": ""
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|exerciseLogQueryRequest|ExerciseLogQueryRequest|body|true|ExerciseLogQueryRequest|ExerciseLogQueryRequest|
+|&emsp;&emsp;current|||false|integer(int32)||
+|&emsp;&emsp;pageSize|||false|integer(int32)||
+|&emsp;&emsp;sortField|||false|string||
+|&emsp;&emsp;sortOrder|||false|string||
+|&emsp;&emsp;userId|||false|integer(int64)||
+|&emsp;&emsp;exerciseType|||false|string||
+|&emsp;&emsp;startDate|||false|string(date-time)||
+|&emsp;&emsp;endDate|||false|string(date-time)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponsePageExerciseLogVO|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||PageExerciseLogVO|PageExerciseLogVO|
+|&emsp;&emsp;records||array|ExerciseLogVO|
+|&emsp;&emsp;&emsp;&emsp;id||integer||
+|&emsp;&emsp;&emsp;&emsp;userId||integer||
+|&emsp;&emsp;&emsp;&emsp;exerciseType||string||
+|&emsp;&emsp;&emsp;&emsp;duration||integer||
+|&emsp;&emsp;&emsp;&emsp;caloriesBurned||number||
+|&emsp;&emsp;&emsp;&emsp;dateRecorded||string||
+|&emsp;&emsp;&emsp;&emsp;notes||string||
+|&emsp;&emsp;&emsp;&emsp;createTime||string||
+|&emsp;&emsp;total||integer(int64)||
+|&emsp;&emsp;size||integer(int64)||
+|&emsp;&emsp;current||integer(int64)||
+|&emsp;&emsp;orders||array|OrderItem|
+|&emsp;&emsp;&emsp;&emsp;column||string||
+|&emsp;&emsp;&emsp;&emsp;asc||boolean||
+|&emsp;&emsp;optimizeCountSql||PageExerciseLogVO|PageExerciseLogVO|
+|&emsp;&emsp;searchCount||PageExerciseLogVO|PageExerciseLogVO|
+|&emsp;&emsp;optimizeJoinOfCountSql||boolean||
+|&emsp;&emsp;maxLimit||integer(int64)||
+|&emsp;&emsp;countId||string||
+|&emsp;&emsp;pages||integer(int64)||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": {
+		"records": [
+			{
+				"id": 0,
+				"userId": 0,
+				"exerciseType": "",
+				"duration": 0,
+				"caloriesBurned": 0,
+				"dateRecorded": "",
+				"notes": "",
+				"createTime": ""
+			}
+		],
+		"total": 0,
+		"size": 0,
+		"current": 0,
+		"orders": [
+			{
+				"column": "",
+				"asc": true
+			}
+		],
+		"optimizeCountSql": {},
+		"searchCount": {},
+		"optimizeJoinOfCountSql": true,
+		"maxLimit": 0,
+		"countId": "",
+		"pages": 0
+	},
+	"message": ""
+}
+```
+
+
+## getExerciseStats
+
+
+**接口地址**:`/api/fitness/exercise/stats`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|days||query|false|integer(int32)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseListExerciseLogVO|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||array|ExerciseLogVO|
+|&emsp;&emsp;id||integer(int64)||
+|&emsp;&emsp;userId||integer(int64)||
+|&emsp;&emsp;exerciseType||string||
+|&emsp;&emsp;duration||integer(int32)||
+|&emsp;&emsp;caloriesBurned||number(float)||
+|&emsp;&emsp;dateRecorded||string(date-time)||
+|&emsp;&emsp;notes||string||
+|&emsp;&emsp;createTime||string(date-time)||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": [
+		{
+			"id": 0,
+			"userId": 0,
+			"exerciseType": "",
+			"duration": 0,
+			"caloriesBurned": 0,
+			"dateRecorded": "",
+			"notes": "",
+			"createTime": ""
+		}
+	],
+	"message": ""
+}
+```
+
+
+## getActiveFitnessGoals
+
+
+**接口地址**:`/api/fitness/goal/active`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+暂无
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseListFitnessGoalVO|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||array|FitnessGoalVO|
+|&emsp;&emsp;id||integer(int64)||
+|&emsp;&emsp;userId||integer(int64)||
+|&emsp;&emsp;goalType||string||
+|&emsp;&emsp;targetValue||string||
+|&emsp;&emsp;startDate||string(date-time)||
+|&emsp;&emsp;endDate||string(date-time)||
+|&emsp;&emsp;progress||string||
+|&emsp;&emsp;isAchieved||integer(int32)||
+|&emsp;&emsp;createTime||string(date-time)||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": [
+		{
+			"id": 0,
+			"userId": 0,
+			"goalType": "",
+			"targetValue": "",
+			"startDate": "",
+			"endDate": "",
+			"progress": "",
+			"isAchieved": 0,
+			"createTime": ""
+		}
+	],
+	"message": ""
+}
+```
+
+
+## addFitnessGoal
+
+
+**接口地址**:`/api/fitness/goal/add`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "goalType": "",
+  "targetValue": "",
+  "startDate": "",
+  "endDate": ""
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|fitnessGoalAddRequest|FitnessGoalAddRequest|body|true|FitnessGoalAddRequest|FitnessGoalAddRequest|
+|&emsp;&emsp;goalType|||false|string||
+|&emsp;&emsp;targetValue|||false|string||
+|&emsp;&emsp;startDate|||false|string(date-time)||
+|&emsp;&emsp;endDate|||false|string(date-time)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseLong|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||integer(int64)|integer(int64)|
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": 0,
+	"message": ""
+}
+```
+
+
+## deleteFitnessGoal
+
+
+**接口地址**:`/api/fitness/goal/delete`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "id": 0
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|deleteRequest|DeleteRequest|body|true|DeleteRequest|DeleteRequest|
+|&emsp;&emsp;id|||false|integer(int64)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseBoolean|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||boolean||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": true,
+	"message": ""
+}
+```
+
+
+## listMyFitnessGoalByPage
+
+
+**接口地址**:`/api/fitness/goal/my/list/page`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "current": 0,
+  "pageSize": 0,
+  "sortField": "",
+  "sortOrder": "",
+  "userId": 0,
+  "goalType": "",
+  "isAchieved": 0
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|fitnessGoalQueryRequest|FitnessGoalQueryRequest|body|true|FitnessGoalQueryRequest|FitnessGoalQueryRequest|
+|&emsp;&emsp;current|||false|integer(int32)||
+|&emsp;&emsp;pageSize|||false|integer(int32)||
+|&emsp;&emsp;sortField|||false|string||
+|&emsp;&emsp;sortOrder|||false|string||
+|&emsp;&emsp;userId|||false|integer(int64)||
+|&emsp;&emsp;goalType|||false|string||
+|&emsp;&emsp;isAchieved|||false|integer(int32)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponsePageFitnessGoalVO|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||PageFitnessGoalVO|PageFitnessGoalVO|
+|&emsp;&emsp;records||array|FitnessGoalVO|
+|&emsp;&emsp;&emsp;&emsp;id||integer||
+|&emsp;&emsp;&emsp;&emsp;userId||integer||
+|&emsp;&emsp;&emsp;&emsp;goalType||string||
+|&emsp;&emsp;&emsp;&emsp;targetValue||string||
+|&emsp;&emsp;&emsp;&emsp;startDate||string||
+|&emsp;&emsp;&emsp;&emsp;endDate||string||
+|&emsp;&emsp;&emsp;&emsp;progress||string||
+|&emsp;&emsp;&emsp;&emsp;isAchieved||integer||
+|&emsp;&emsp;&emsp;&emsp;createTime||string||
+|&emsp;&emsp;total||integer(int64)||
+|&emsp;&emsp;size||integer(int64)||
+|&emsp;&emsp;current||integer(int64)||
+|&emsp;&emsp;orders||array|OrderItem|
+|&emsp;&emsp;&emsp;&emsp;column||string||
+|&emsp;&emsp;&emsp;&emsp;asc||boolean||
+|&emsp;&emsp;optimizeCountSql||PageFitnessGoalVO|PageFitnessGoalVO|
+|&emsp;&emsp;searchCount||PageFitnessGoalVO|PageFitnessGoalVO|
+|&emsp;&emsp;optimizeJoinOfCountSql||boolean||
+|&emsp;&emsp;maxLimit||integer(int64)||
+|&emsp;&emsp;countId||string||
+|&emsp;&emsp;pages||integer(int64)||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": {
+		"records": [
+			{
+				"id": 0,
+				"userId": 0,
+				"goalType": "",
+				"targetValue": "",
+				"startDate": "",
+				"endDate": "",
+				"progress": "",
+				"isAchieved": 0,
+				"createTime": ""
+			}
+		],
+		"total": 0,
+		"size": 0,
+		"current": 0,
+		"orders": [
+			{
+				"column": "",
+				"asc": true
+			}
+		],
+		"optimizeCountSql": {},
+		"searchCount": {},
+		"optimizeJoinOfCountSql": true,
+		"maxLimit": 0,
+		"countId": "",
+		"pages": 0
+	},
+	"message": ""
+}
+```
+
+
+## updateFitnessGoal
+
+
+**接口地址**:`/api/fitness/goal/update`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "id": 0,
+  "goalType": "",
+  "targetValue": "",
+  "startDate": "",
+  "endDate": "",
+  "progress": "",
+  "isAchieved": 0
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|fitnessGoalUpdateRequest|FitnessGoalUpdateRequest|body|true|FitnessGoalUpdateRequest|FitnessGoalUpdateRequest|
+|&emsp;&emsp;id|||false|integer(int64)||
+|&emsp;&emsp;goalType|||false|string||
+|&emsp;&emsp;targetValue|||false|string||
+|&emsp;&emsp;startDate|||false|string(date-time)||
+|&emsp;&emsp;endDate|||false|string(date-time)||
+|&emsp;&emsp;progress|||false|string||
+|&emsp;&emsp;isAchieved|||false|integer(int32)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseBoolean|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||boolean||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": true,
+	"message": ""
+}
+```
+
+
+## addTrainingPlan
+
+
+**接口地址**:`/api/fitness/plan/add`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "planName": "",
+  "planType": "",
+  "planDetails": "",
+  "isDefault": 0,
+  "startDate": "",
+  "endDate": ""
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|trainingPlanAddRequest|TrainingPlanAddRequest|body|true|TrainingPlanAddRequest|TrainingPlanAddRequest|
+|&emsp;&emsp;planName|||false|string||
+|&emsp;&emsp;planType|||false|string||
+|&emsp;&emsp;planDetails|||false|string||
+|&emsp;&emsp;isDefault|||false|integer(int32)||
+|&emsp;&emsp;startDate|||false|string(date-time)||
+|&emsp;&emsp;endDate|||false|string(date-time)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseLong|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||integer(int64)|integer(int64)|
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": 0,
+	"message": ""
+}
+```
+
+
+## getDefaultTrainingPlans
+
+
+**接口地址**:`/api/fitness/plan/default`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+暂无
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseListTrainingPlanVO|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||array|TrainingPlanVO|
+|&emsp;&emsp;id||integer(int64)||
+|&emsp;&emsp;userId||integer(int64)||
+|&emsp;&emsp;planName||string||
+|&emsp;&emsp;planType||string||
+|&emsp;&emsp;planDetails||string||
+|&emsp;&emsp;isDefault||integer(int32)||
+|&emsp;&emsp;startDate||string(date-time)||
+|&emsp;&emsp;endDate||string(date-time)||
+|&emsp;&emsp;createTime||string(date-time)||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": [
+		{
+			"id": 0,
+			"userId": 0,
+			"planName": "",
+			"planType": "",
+			"planDetails": "",
+			"isDefault": 0,
+			"startDate": "",
+			"endDate": "",
+			"createTime": ""
+		}
+	],
+	"message": ""
+}
+```
+
+
+## deleteTrainingPlan
+
+
+**接口地址**:`/api/fitness/plan/delete`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "id": 0
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|deleteRequest|DeleteRequest|body|true|DeleteRequest|DeleteRequest|
+|&emsp;&emsp;id|||false|integer(int64)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseBoolean|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||boolean||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": true,
+	"message": ""
+}
+```
+
+
+## listMyTrainingPlanByPage
+
+
+**接口地址**:`/api/fitness/plan/my/list/page`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "current": 0,
+  "pageSize": 0,
+  "sortField": "",
+  "sortOrder": "",
+  "userId": 0,
+  "planName": "",
+  "planType": "",
+  "isDefault": 0
+}
+```
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|trainingPlanQueryRequest|TrainingPlanQueryRequest|body|true|TrainingPlanQueryRequest|TrainingPlanQueryRequest|
+|&emsp;&emsp;current|||false|integer(int32)||
+|&emsp;&emsp;pageSize|||false|integer(int32)||
+|&emsp;&emsp;sortField|||false|string||
+|&emsp;&emsp;sortOrder|||false|string||
+|&emsp;&emsp;userId|||false|integer(int64)||
+|&emsp;&emsp;planName|||false|string||
+|&emsp;&emsp;planType|||false|string||
+|&emsp;&emsp;isDefault|||false|integer(int32)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponsePageTrainingPlanVO|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||PageTrainingPlanVO|PageTrainingPlanVO|
+|&emsp;&emsp;records||array|TrainingPlanVO|
+|&emsp;&emsp;&emsp;&emsp;id||integer||
+|&emsp;&emsp;&emsp;&emsp;userId||integer||
+|&emsp;&emsp;&emsp;&emsp;planName||string||
+|&emsp;&emsp;&emsp;&emsp;planType||string||
+|&emsp;&emsp;&emsp;&emsp;planDetails||string||
+|&emsp;&emsp;&emsp;&emsp;isDefault||integer||
+|&emsp;&emsp;&emsp;&emsp;startDate||string||
+|&emsp;&emsp;&emsp;&emsp;endDate||string||
+|&emsp;&emsp;&emsp;&emsp;createTime||string||
+|&emsp;&emsp;total||integer(int64)||
+|&emsp;&emsp;size||integer(int64)||
+|&emsp;&emsp;current||integer(int64)||
+|&emsp;&emsp;orders||array|OrderItem|
+|&emsp;&emsp;&emsp;&emsp;column||string||
+|&emsp;&emsp;&emsp;&emsp;asc||boolean||
+|&emsp;&emsp;optimizeCountSql||PageTrainingPlanVO|PageTrainingPlanVO|
+|&emsp;&emsp;searchCount||PageTrainingPlanVO|PageTrainingPlanVO|
+|&emsp;&emsp;optimizeJoinOfCountSql||boolean||
+|&emsp;&emsp;maxLimit||integer(int64)||
+|&emsp;&emsp;countId||string||
+|&emsp;&emsp;pages||integer(int64)||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": {
+		"records": [
+			{
+				"id": 0,
+				"userId": 0,
+				"planName": "",
+				"planType": "",
+				"planDetails": "",
+				"isDefault": 0,
+				"startDate": "",
+				"endDate": "",
+				"createTime": ""
+			}
+		],
+		"total": 0,
+		"size": 0,
+		"current": 0,
+		"orders": [
+			{
+				"column": "",
+				"asc": true
+			}
+		],
+		"optimizeCountSql": {},
+		"searchCount": {},
+		"optimizeJoinOfCountSql": true,
+		"maxLimit": 0,
+		"countId": "",
+		"pages": 0
+	},
+	"message": ""
+}
+```
+
+
 # health-controller
 
 
@@ -719,6 +2477,114 @@
 {
 	"code": 0,
 	"data": 0,
+	"message": ""
+}
+```
+
+
+## updateAvatar
+
+
+**接口地址**:`/api/user/avatar/update`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|avatarUrl||query|true|string||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseBoolean|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||boolean||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": true,
+	"message": ""
+}
+```
+
+
+## uploadAvatar
+
+
+**接口地址**:`/api/user/avatar/upload`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded,application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|file||query|true|file||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|BaseResponseString|
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||string||
+|message||string||
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": "",
 	"message": ""
 }
 ```

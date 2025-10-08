@@ -24,6 +24,7 @@ pnpm-debug.log*
 
 # Documentation and scripts
 scripts/
+public
 CSS_VARIABLES_THEME_GUIDE.md
 DARK_MODE_FINAL_OPTIMIZATION.md
 DARK_MODE_FINAL_SOLUTION.md
@@ -40,3 +41,4 @@ THEME_FEATURE.md
 体脂率显示问题解决方案.md
 体脂率自动计算功能说明.md
 运动卡路里自动计算功能说明.md
+健身排行榜后端接口文档.md

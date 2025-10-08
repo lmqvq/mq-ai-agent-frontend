@@ -43,27 +43,19 @@ const routes = [
         }
     },
     {
-        path: '/management',
-        name: 'FitnessManagement',
-        component: () => import('../views/FitnessManagement.vue'),
-        meta: {
-            title: '健身管理中心 - AI健身教练'
-        }
-    },
-    {
-        path: '/plans',
-        name: 'FitnessPlans',
-        component: () => import('../views/FitnessPlans.vue'),
-        meta: {
-            title: '健身计划 - AI健身教练'
-        }
-    },
-    {
         path: '/knowledge',
         name: 'FitnessKnowledge',
         component: () => import('../views/FitnessKnowledge.vue'),
         meta: {
             title: '健身知识库 - AI健身教练'
+        }
+    },
+    {
+        path: '/ranking',
+        name: 'FitnessRanking',
+        component: () => import('../views/FitnessRanking.vue'),
+        meta: {
+            title: '健身排行榜 - AI健身教练'
         }
     },
     {
