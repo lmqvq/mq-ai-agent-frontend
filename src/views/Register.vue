@@ -280,9 +280,32 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1e3c72 100%);
+  background: var(--color-bg-1);
   position: relative;
   overflow: hidden;
+  transition: background 0.3s ease;
+  
+  // 暗黑模式渐变背景
+  body[arco-theme='dark'] & {
+    background: linear-gradient(135deg, 
+      rgba(15, 15, 35, 1) 0%, 
+      rgba(26, 26, 46, 1) 25%, 
+      rgba(22, 33, 62, 1) 50%, 
+      rgba(15, 52, 96, 1) 75%, 
+      rgba(30, 60, 114, 1) 100%
+    );
+  }
+  
+  // 白色模式渐变背景
+  body:not([arco-theme='dark']) & {
+    background: linear-gradient(135deg, 
+      #f5f7fa 0%, 
+      #e8ecf1 25%, 
+      #dbe2ea 50%, 
+      #d2dae5 75%, 
+      #c9d3e0 100%
+    );
+  }
 }
 
 .fitness-background {
@@ -292,19 +315,79 @@ export default {
   width: 100%;
   height: 100%;
   z-index: 1;
+  transition: all 0.3s ease;
 
-  // 健身器材剪影背景
+  // 现代几何背景层
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+      radial-gradient(circle at 30% 40%, rgba(var(--success-rgb), 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 70% 60%, rgba(var(--warning-rgb), 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(var(--primary-rgb), 0.05) 0%, transparent 50%);
+    animation: gradient-shift 20s ease infinite;
+  }
+
+  // 网格图案
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      linear-gradient(rgba(var(--success-rgb), 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--success-rgb), 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: grid-move 60s linear infinite;
+    
+    body[arco-theme='dark'] & {
+      opacity: 0.3;
+    }
+    
+    body:not([arco-theme='dark']) & {
+      opacity: 0.15;
+    }
+  }
+
+  // 几何形状装饰
   .fitness-silhouettes {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    pointer-events: none;
 
     .silhouette {
       position: absolute;
-      opacity: 0.8;
-      animation: float-silhouette 8s ease-in-out infinite;
+      opacity: 0;
+      animation: geometric-float 15s ease-in-out infinite;
+      
+      body[arco-theme='dark'] & {
+        opacity: 0.06;
+        filter: brightness(1.2);
+      }
+      
+      body:not([arco-theme='dark']) & {
+        opacity: 0.08;
+        filter: brightness(0.8) contrast(1.1);
+      }
+
+      path {
+        body[arco-theme='dark'] & {
+          fill: rgba(255, 255, 255, 0.08);
+        }
+        
+        body:not([arco-theme='dark']) & {
+          fill: rgba(0, 0, 0, 0.06);
+        }
+      }
 
       &.dumbbell-1 {
         top: 15%;
@@ -319,7 +402,7 @@ export default {
         right: 10%;
         width: 100px;
         height: 25px;
-        animation-delay: 2s;
+        animation-delay: 5s;
       }
 
       &.kettlebell-1 {
@@ -327,7 +410,7 @@ export default {
         left: 12%;
         width: 40px;
         height: 60px;
-        animation-delay: 4s;
+        animation-delay: 10s;
       }
 
       &.treadmill-1 {
@@ -335,124 +418,148 @@ export default {
         right: 15%;
         width: 80px;
         height: 48px;
-        animation-delay: 6s;
+        animation-delay: 15s;
       }
     }
   }
 
-  // 动态粒子系统
+  // 优雅的粒子系统
   .particle-system {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    pointer-events: none;
 
     .particle {
       position: absolute;
-      background: radial-gradient(circle, rgba(78, 205, 196, 0.6) 0%, rgba(255, 195, 113, 0.4) 50%, transparent 100%);
       border-radius: 50%;
-      animation: particle-float linear infinite;
-      top: 100%;
+      animation: elegant-particle-float linear infinite;
+      top: 110%;
+      
+      body[arco-theme='dark'] & {
+        background: radial-gradient(circle, 
+          rgba(var(--success-rgb), 0.3) 0%, 
+          rgba(var(--warning-rgb), 0.2) 50%, 
+          transparent 100%
+        );
+      }
+      
+      body:not([arco-theme='dark']) & {
+        background: radial-gradient(circle, 
+          rgba(var(--success-rgb), 0.15) 0%, 
+          rgba(var(--warning-rgb), 0.1) 50%, 
+          transparent 100%
+        );
+      }
     }
   }
 
-  // 增强的肌肉纹理背景
+  // 光影纹理层
   .muscle-texture {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image:
-      radial-gradient(ellipse at 25% 20%, rgba(78, 205, 196, 0.15) 0%, transparent 60%),
-      radial-gradient(ellipse at 75% 30%, rgba(255, 195, 113, 0.12) 0%, transparent 60%),
-      radial-gradient(ellipse at 40% 70%, rgba(255, 107, 107, 0.1) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 80%, rgba(138, 43, 226, 0.08) 0%, transparent 60%),
-      linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.02) 50%, transparent 60%);
-    animation: muscle-pulse 6s ease-in-out infinite;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    
+    body[arco-theme='dark'] & {
+      background-image:
+        radial-gradient(ellipse at 30% 25%, rgba(var(--success-rgb), 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 75%, rgba(var(--warning-rgb), 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(var(--primary-rgb), 0.08) 0%, transparent 50%);
+    }
+    
+    body:not([arco-theme='dark']) & {
+      background-image:
+        radial-gradient(ellipse at 30% 25%, rgba(var(--success-rgb), 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 75%, rgba(var(--warning-rgb), 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(var(--primary-rgb), 0.04) 0%, transparent 50%);
+    }
+    
+    animation: texture-pulse 12s ease-in-out infinite;
   }
 
-  // 升级的浮动图标系统
+  // 精致的浮动图标
   .floating-icons {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    pointer-events: none;
 
     .icon-item {
       position: absolute;
-      color: rgba(255, 255, 255, 0.12);
-      font-size: 28px;
-      animation: enhanced-float 8s ease-in-out infinite;
-      filter: drop-shadow(0 0 8px rgba(78, 205, 196, 0.3));
-
-      :deep(svg) {
-        width: 36px;
-        height: 36px;
-        transition: all 0.3s ease;
+      font-size: 32px;
+      animation: elegant-icon-float 12s ease-in-out infinite;
+      transition: all 0.3s ease;
+      
+      body[arco-theme='dark'] & {
+        color: rgba(255, 255, 255, 0.08);
+        filter: drop-shadow(0 0 10px rgba(var(--success-rgb), 0.15));
+      }
+      
+      body:not([arco-theme='dark']) & {
+        color: rgba(0, 0, 0, 0.05);
+        filter: drop-shadow(0 0 10px rgba(var(--success-rgb), 0.1));
       }
 
-      &:hover :deep(svg) {
-        transform: scale(1.2);
-        filter: drop-shadow(0 0 12px rgba(255, 195, 113, 0.6));
+      :deep(svg) {
+        width: 40px;
+        height: 40px;
+        transition: all 0.4s ease;
       }
 
       &:nth-child(1) {
-        top: 12%;
+        top: 10%;
         left: 8%;
         animation-delay: 0s;
-        color: rgba(78, 205, 196, 0.15);
       }
 
       &:nth-child(2) {
-        top: 22%;
-        right: 12%;
-        animation-delay: 1s;
-        color: rgba(255, 195, 113, 0.15);
+        top: 20%;
+        right: 10%;
+        animation-delay: 1.5s;
       }
 
       &:nth-child(3) {
-        top: 55%;
-        left: 12%;
-        animation-delay: 2s;
-        color: rgba(255, 107, 107, 0.15);
+        top: 50%;
+        left: 15%;
+        animation-delay: 3s;
       }
 
       &:nth-child(4) {
-        bottom: 25%;
-        right: 18%;
-        animation-delay: 3s;
-        color: rgba(138, 43, 226, 0.15);
+        bottom: 20%;
+        right: 12%;
+        animation-delay: 4.5s;
       }
 
       &:nth-child(5) {
-        bottom: 12%;
-        left: 22%;
-        animation-delay: 4s;
-        color: rgba(78, 205, 196, 0.12);
+        bottom: 10%;
+        left: 20%;
+        animation-delay: 6s;
       }
 
       &:nth-child(6) {
         top: 35%;
-        right: 25%;
-        animation-delay: 5s;
-        color: rgba(255, 195, 113, 0.12);
+        right: 20%;
+        animation-delay: 7.5s;
       }
 
       &:nth-child(7) {
-        top: 65%;
+        top: 70%;
         right: 8%;
-        animation-delay: 6s;
-        color: rgba(255, 107, 107, 0.12);
+        animation-delay: 9s;
       }
 
       &:nth-child(8) {
-        bottom: 40%;
+        bottom: 35%;
         left: 5%;
-        animation-delay: 7s;
-        color: rgba(138, 43, 226, 0.12);
+        animation-delay: 10.5s;
       }
     }
   }
@@ -460,28 +567,49 @@ export default {
 
 .register-card {
   width: 480px;
-  background: rgba(255, 255, 255, 0.98);
-  -webkit-backdrop-filter: blur(25px);
-  backdrop-filter: blur(25px);
-  border-radius: 28px;
-  padding: 52px;
-  box-shadow:
-    0 32px 100px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  background: var(--color-bg-2);
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
+  border-radius: 24px;
+  padding: 48px;
   position: relative;
   z-index: 2;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--color-border-2);
   transform: translateY(0);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  body[arco-theme='dark'] & {
+    background: rgba(30, 30, 40, 0.85);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  
+  body:not([arco-theme='dark']) & {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
 
   &:hover {
-    transform: translateY(-8px);
-    box-shadow:
-      0 40px 120px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transform: translateY(-6px);
+    
+    body[arco-theme='dark'] & {
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    
+    body:not([arco-theme='dark']) & {
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+    }
   }
 
   &::before {
@@ -491,26 +619,23 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg,
-      rgba(255, 255, 255, 0.15) 0%,
-      rgba(255, 255, 255, 0.08) 50%,
-      rgba(255, 255, 255, 0.05) 100%);
-    border-radius: 28px;
+    border-radius: 24px;
     z-index: -1;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 1px;
-    left: 1px;
-    right: 1px;
-    height: 50%;
-    background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.2) 0%,
-      transparent 100%);
-    border-radius: 27px 27px 0 0;
-    z-index: -1;
+    opacity: 0.5;
+    
+    body[arco-theme='dark'] & {
+      background: linear-gradient(135deg,
+        rgba(var(--success-rgb), 0.08) 0%,
+        transparent 50%,
+        rgba(var(--warning-rgb), 0.08) 100%);
+    }
+    
+    body:not([arco-theme='dark']) & {
+      background: linear-gradient(135deg,
+        rgba(var(--success-rgb), 0.03) 0%,
+        transparent 50%,
+        rgba(var(--warning-rgb), 0.03) 100%);
+    }
   }
 }
 
@@ -883,63 +1008,83 @@ export default {
   }
 }
 
-// 增强的动画效果系统
-@keyframes muscle-pulse {
+// 优化的动画效果系统
+@keyframes gradient-shift {
   0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.02);
-  }
-}
-
-@keyframes enhanced-float {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg) scale(1);
+    transform: translate(0, 0) rotate(0deg);
   }
   25% {
-    transform: translateY(-12px) rotate(3deg) scale(1.05);
+    transform: translate(2%, -2%) rotate(1deg);
   }
   50% {
-    transform: translateY(-8px) rotate(-2deg) scale(1.02);
+    transform: translate(-1%, 3%) rotate(-0.5deg);
   }
   75% {
-    transform: translateY(6px) rotate(4deg) scale(1.03);
+    transform: translate(-2%, -1%) rotate(0.5deg);
   }
 }
 
-@keyframes float-silhouette {
+@keyframes grid-move {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+@keyframes geometric-float {
   0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-    opacity: 0.8;
+    transform: translateY(0) rotate(0deg);
   }
-  33% {
-    transform: translateY(-8px) rotate(2deg);
-    opacity: 0.6;
-  }
-  66% {
-    transform: translateY(4px) rotate(-1deg);
-    opacity: 0.9;
+  50% {
+    transform: translateY(-15px) rotate(5deg);
   }
 }
 
-@keyframes particle-float {
+@keyframes elegant-particle-float {
   0% {
     transform: translateY(0) translateX(0) scale(0);
     opacity: 0;
   }
-  10% {
+  5% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  95% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-120vh) translateX(30px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes texture-pulse {
+  0%, 100% {
     opacity: 1;
     transform: scale(1);
   }
-  90% {
+  50% {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes elegant-icon-float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
     opacity: 1;
   }
-  100% {
-    transform: translateY(-100vh) translateX(20px) scale(0);
-    opacity: 0;
+  25% {
+    transform: translateY(-10px) scale(1.05);
+  }
+  50% {
+    transform: translateY(-5px) scale(1);
+    opacity: 0.8;
+  }
+  75% {
+    transform: translateY(8px) scale(1.02);
   }
 }
 

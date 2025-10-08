@@ -28,6 +28,21 @@ export default {
   box-sizing: border-box;
 }
 
+// 主题颜色 RGB 变量
+:root {
+  --primary-rgb: 102, 126, 234;
+  --success-rgb: 78, 205, 196;
+  --warning-rgb: 255, 195, 113;
+  --danger-rgb: 255, 107, 107;
+}
+
+body[arco-theme='dark'] {
+  --primary-rgb: 141, 154, 255;
+  --success-rgb: 94, 220, 210;
+  --warning-rgb: 255, 210, 133;
+  --danger-rgb: 255, 130, 130;
+}
+
 html, body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
